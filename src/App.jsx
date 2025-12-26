@@ -7,6 +7,8 @@ const ShukiApp = () => {
   const [copied, setCopied] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
+    phone: '',
     residents: '',
     livingEnvironment: '',
     currentPreparation: '',
@@ -230,8 +232,8 @@ const ShukiApp = () => {
     // URLパラメータとして送信
     const params = new URLSearchParams({
       name: formData.name || '未入力',
-      email: '',
-      phone: '',
+      email: formData.email || '',
+      phone: formData.phone || '',
       residents: formData.residents,
       disasterType: rec.disasterType.type,
       livingEnvironment: formData.livingEnvironment,
@@ -306,8 +308,14 @@ const ShukiApp = () => {
               </div>
 
               <div className="space-y-8">
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3">お名前（任意）</label>
+                <div><label className="block text-lg font-semibold text-slate-700 mb-3">お名前 <span className="text-orange-500">*</span></label>
                   <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none" placeholder="山田 太郎" /></div>
+
+                <div><label className="block text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Mail className="w-5 h-5 text-orange-500" />メールアドレス <span className="text-orange-500">*</span></label>
+                  <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none" placeholder="example@email.com" /></div>
+
+                <div><label className="block text-lg font-semibold text-slate-700 mb-3">電話番号 <span className="text-orange-500">*</span></label>
+                  <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none" placeholder="090-1234-5678" /></div>
 
                 <div><label className="block text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Home className="w-5 h-5 text-orange-500" />居住環境 <span className="text-orange-500">*</span></label>
                   <div className="grid grid-cols-3 gap-3">
@@ -416,7 +424,7 @@ const ShukiApp = () => {
               <div className="mt-10 flex justify-end">
                 <button 
                   onClick={() => handleStepChange(3)} 
-                  disabled={!formData.livingEnvironment || !formData.residents || !formData.currentPreparation || 
+                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || !formData.residents || !formData.currentPreparation || 
                     formData.persons.slice(0, getPersonCount()).some(p => 
                       !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
                     )
