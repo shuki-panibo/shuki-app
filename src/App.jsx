@@ -100,7 +100,46 @@ const ShukiApp = () => {
 
   const generateRecommendations = () => {
     const personCount = getPersonCount();
-    const hasWoman = formData.persons.slice(0, personCount).some(p => p.gender === '女性');
+    
+    // 完全な商品データベース
+    const foodDatabase = {
+      'さばの味噌煮': { category: 'おかず', price: 440, allergens: ['小麦', 'さば', '大豆'], icon: '🐟' },
+      'いわしの煮付': { category: 'おかず', price: 440, allergens: ['小麦', '大豆'], icon: '🐟' },
+      '赤魚の煮付': { category: 'おかず', price: 480, allergens: ['小麦', '大豆'], icon: '🐟' },
+      'ハンバーグ煮込み': { category: 'おかず', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
+      'ハンバーグ煮込みトマトソース': { category: 'おかず', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
+      '中華風ミートボール': { category: 'おかず', price: 440, allergens: ['小麦', '卵', '乳製品'], icon: '🥢' },
+      '肉じゃが': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥔' },
+      '筑前煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥕' },
+      '豚汁': { category: 'おかず', price: 420, allergens: [], icon: '🍲' },
+      'きんぴらごぼう': { category: 'おかず', price: 400, allergens: ['小麦'], icon: '🥕' },
+      '鶏と野菜のトマト煮': { category: 'おかず', price: 480, allergens: ['小麦', '乳製品'], icon: '🍗' },
+      '根菜のやわらか煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥕' },
+      '里芋の鶏そぼろ煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🍲' },
+      'おでん': { category: 'おかず', price: 450, allergens: ['小麦'], icon: '🍢' },
+      'けんちん汁': { category: 'おかず', price: 420, allergens: [], icon: '🍲' },
+      '牛丼の具': { category: '主食', price: 550, allergens: ['小麦'], icon: '🍖' },
+      'ポークカレー': { category: '主食', price: 480, allergens: ['小麦', '乳製品'], icon: '🍛' },
+      '鮭粥': { category: '主食', price: 350, allergens: [], icon: '🍚' },
+      '白粥': { category: '主食', price: 280, allergens: [], icon: '🍚' },
+      '梅粥': { category: '主食', price: 280, allergens: [], icon: '🍚' },
+      '塩ラーメン味': { category: '麺類', price: 580, allergens: ['小麦', '卵'], icon: '🍜' },
+      'しょうゆラーメン味': { category: '麺類', price: 580, allergens: ['小麦', '卵'], icon: '🍜' },
+      'うどん味': { category: '麺類', price: 580, allergens: ['小麦'], icon: '🍜' },
+      'あじのムース（にんじん付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🐟' },
+      'いかのムース（ごぼう付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🦑' },
+      '牛肉のムース（すき焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
+      '豚肉のムース（しょうが焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
+      'スティックバウムクーヘン（プレーン）': { category: '甘味', price: 350, allergens: ['小麦', '卵', '乳製品'], icon: '🍰' },
+      'スティックバウムクーヘン（ココア）': { category: '甘味', price: 350, allergens: ['小麦', '卵', '乳製品'], icon: '🍰' },
+      'さつま芋のレモン煮': { category: '副菜', price: 400, allergens: [], icon: '🍠' },
+      'ソフト金時豆': { category: '副菜', price: 380, allergens: [], icon: '🫘' },
+      'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420, allergens: [], icon: '🎃', allergenFree: true }
+    };
+
+    // 最安基本セット
+    const baseSetPrice = 1990;
+    const baseSet = ['白粥', '梅粥', '鮭粥', 'スティックバウムクーヘン（プレーン）', 'スティックバウムクーヘン（ココア）', 'ソフト金時豆'];
     
     // 人数分のボックス生成
     const boxes = [];
@@ -108,189 +147,136 @@ const ShukiApp = () => {
     for (let i = 0; i < personCount; i++) {
       const person = formData.persons[i];
       
-      // ベースアイテム（各人共通）
-      const baseItems = [
-        { name: '保存水 500ml (2本)', img: '💧' },
-        { name: '防災用品 (アルミブランケット、マスク、軍手、ホイッスル、ウエットティッシュ)', img: '🎒' },
-        { name: '簡易トイレ (10個)', img: '🚽' }
-      ];
-      
-      // マンションの場合は防臭袋を追加
-      if (formData.livingEnvironment === 'mansion') {
-        baseItems.push({ name: 'BOS防臭袋（10枚）', img: '🛍️' });
-      }
-      
-      // 女性の場合は衛生用品を追加
-      if (person.gender === '女性') {
-        baseItems.push({ name: '生理用品・衛生セット', img: '🧴' });
-      }
-      
-      // パーソナライゼーション情報
-      const personalizations = [
-        { reason: `${formData.residents}・${person.age}向けに最適化`, detail: '15L収納ボックスに効率よく収まる、3日分の備蓄を想定' }
-      ];
-      
-      // アレルギー情報の処理
+      // アレルギーチェック関数
       const allergyList = person.allergies.filter(a => a !== '特になし');
       const hasWheat = allergyList.includes('小麦');
       const hasEgg = allergyList.includes('卵');
       const hasMilk = allergyList.includes('乳製品');
       
-      const foodDB = {
-        '牛丼の具': ['小麦'], 'ポークカレー': ['小麦', '乳製品'], 'しょうゆラーメン味': ['小麦', '卵'],
-        '塩ラーメン味': [], 'うどん味': ['小麦'], '白粥': [], '梅粥': [], '鮭粥': [], 'ホワイトシチュー': [],
-        'ハンバーグ煮込み': ['小麦', '卵', '乳製品'], 'さば味噌煮': ['小麦'], '中華風ミートボール': ['小麦', '卵', '乳製品'],
-        'いわしの煮付': ['小麦'], '筑前煮': ['小麦'], '赤魚の煮付': [], 'ハンバーグ煮込みトマトソース': ['小麦', '卵', '乳製品'],
-        '鶏と野菜のトマト煮': ['小麦', '乳製品'], 'さつま芋のレモン煮': [], 'パン缶（プレーン）': ['小麦', '卵', '乳製品'],
-        'パン缶（チョコ）': ['小麦', '卵', '乳製品'], 'かぼちゃ煮': [], 'けんちん汁': []
-      };
-      
-      const checkAllergy = (foodName) => {
-        const allergens = foodDB[foodName] || [];
-        if (hasWheat && allergens.includes('小麦')) return false;
-        if (hasEgg && allergens.includes('卵')) return false;
-        if (hasMilk && allergens.includes('乳製品')) return false;
+      const canEat = (foodName) => {
+        const food = foodDatabase[foodName];
+        if (!food) return false;
+        if (hasWheat && food.allergens.includes('小麦')) return false;
+        if (hasEgg && food.allergens.includes('卵')) return false;
+        if (hasMilk && food.allergens.includes('乳製品')) return false;
         return true;
       };
       
-      const tasteOptions = {
-        'しょっぱいもの好き': { main: ['牛丼の具', 'ポークカレー', 'しょうゆラーメン味'], side: ['ハンバーグ煮込み', 'さば味噌煮', '中華風ミートボール'] },
-        'あっさり・和食系': { main: ['白粥', '梅粥', 'うどん味'], side: ['いわしの煮付', '筑前煮', '赤魚の煮付'] },
-        '辛いもの好き': { main: ['ポークカレー', 'しょうゆラーメン味', '牛丼の具'], side: ['ハンバーグ煮込みトマトソース', '鶏と野菜のトマト煮', '中華風ミートボール'] },
-        '甘いもの好き': { main: ['パン缶（プレーン）', 'パン缶（チョコ）', 'ホワイトシチュー'], side: ['ホワイトシチュー', 'さつま芋のレモン煮', 'かぼちゃ煮'] }
+      // 好みに応じた商品グループ
+      const tasteGroups = {
+        'しょっぱいもの好き': ['牛丼の具', 'ポークカレー', 'しょうゆラーメン味', 'さばの味噌煮', 'ハンバーグ煮込み'],
+        'あっさり・和食系': ['白粥', '梅粥', '鮭粥', 'うどん味', 'いわしの煮付', '筑前煮', '豚汁', 'けんちん汁'],
+        '辛いもの好き': ['ポークカレー', 'しょうゆラーメン味', 'ハンバーグ煮込みトマトソース', '鶏と野菜のトマト煮'],
+        '甘いもの好き': ['さつま芋のレモン煮', 'スティックバウムクーヘン（プレーン）', 'スティックバウムクーヘン（ココア）', 'ソフト金時豆']
       };
       
-      const backups = { main: ['塩ラーメン味', '白粥', '鮭粥', 'けんちん汁'], side: ['赤魚の煮付', 'かぼちゃ煮', 'けんちん汁'] };
+      // 選定ロジック
+      let selectedFoods = [];
+      let personalizations = [];
       
-      let mainFoods = [], sideDishes = [];
-      const pref1 = tasteOptions[person.tastePreference];
-      const pref2 = person.tastePreference2 ? tasteOptions[person.tastePreference2] : null;
+      // 好みの商品から選定
+      const pref1Foods = tasteGroups[person.tastePreference] || [];
+      const pref2Foods = person.tastePreference2 ? (tasteGroups[person.tastePreference2] || []) : [];
       
-      if (pref1 && pref2) {
-        const main1 = pref1.main.filter(checkAllergy).slice(0, 2);
-        const main2 = pref2.main.filter(checkAllergy).filter(m => !main1.includes(m)).slice(0, 1);
-        mainFoods = [...main1, ...main2];
-        
-        const side1 = pref1.side.filter(checkAllergy).slice(0, 2);
-        const side2 = pref2.side.filter(checkAllergy).filter(s => !side1.includes(s)).slice(0, 1);
-        sideDishes = [...side1, ...side2];
-        
-        if (mainFoods.length < 3) {
-          const extras = backups.main.filter(checkAllergy).filter(m => !mainFoods.includes(m)).slice(0, 3 - mainFoods.length);
-          mainFoods = [...mainFoods, ...extras];
-        }
-        if (sideDishes.length < 3) {
-          const extras = backups.side.filter(checkAllergy).filter(s => !sideDishes.includes(s)).slice(0, 3 - sideDishes.length);
-          sideDishes = [...sideDishes, ...extras];
-        }
-        
-        personalizations.push({ reason: `${person.tastePreference}と${person.tastePreference2}をバランスよく`, detail: '第一希望から2品、第二希望から1品を選定してバラエティ豊かに構成' });
-      } else if (pref1) {
-        mainFoods = pref1.main.filter(checkAllergy).slice(0, 3);
-        if (mainFoods.length < 3) mainFoods = [...mainFoods, ...backups.main.filter(checkAllergy)].slice(0, 3);
-        
-        sideDishes = pref1.side.filter(checkAllergy).slice(0, 3);
-        if (sideDishes.length < 3) sideDishes = [...sideDishes, ...backups.side.filter(checkAllergy)].slice(0, 3);
-        
-        personalizations.push({ reason: `${person.tastePreference}に対応`, detail: 'お好みに合わせた食品を選定' });
+      // アレルギー対応商品を優先的に選ぶ
+      const availablePref1 = pref1Foods.filter(canEat);
+      const availablePref2 = pref2Foods.filter(canEat).filter(f => !availablePref1.includes(f));
+      
+      // 第一希望から3品、第二希望から2品を選定
+      selectedFoods = [
+        ...availablePref1.slice(0, 3),
+        ...availablePref2.slice(0, 2)
+      ];
+      
+      // 不足分を最安商品で埋める
+      if (selectedFoods.length < 6) {
+        const cheapSafe = baseSet.filter(canEat).filter(f => !selectedFoods.includes(f));
+        selectedFoods = [...selectedFoods, ...cheapSafe].slice(0, 6);
       }
       
-      const icons = {
-        '牛丼の具': '🍖', 'ポークカレー': '🍛', 'しょうゆラーメン味': '🍜', '塩ラーメン味': '🍜', 'うどん味': '🍜', '白粥': '🍚', '梅粥': '🍚',
-        '鮭粥': '🍚', 'ホワイトシチュー': '🥘', 'ハンバーグ煮込み': '🍖', 'さば味噌煮': '🐟', '中華風ミートボール': '🥢', 'いわしの煮付': '🐟',
-        '筑前煮': '🥕', '赤魚の煮付': '🐟', 'ハンバーグ煮込みトマトソース': '🍖', '鶏と野菜のトマト煮': '🍗', 'さつま芋のレモン煮': '🍠',
-        'パン缶（プレーン）': '🍞', 'パン缶（チョコ）': '🍞', 'かぼちゃ煮': '🎃', 'けんちん汁': '🍲'
-      };
-      
-      const withIcons = (fs) => fs.map(n => ({ name: n, img: icons[n] || '🍱' }));
-      
-      if (allergyList.length > 0 || person.allergyOther) {
-        const at = [...allergyList, person.allergyOther].filter(Boolean).join('、');
-        personalizations.push({ reason: `${at}アレルギー対応`, detail: 'アレルゲンを含まない食品に置き換え' });
+      // まだ6品に満たない場合、全商品から選ぶ
+      if (selectedFoods.length < 6) {
+        const allAvailable = Object.keys(foodDatabase).filter(canEat).filter(f => !selectedFoods.includes(f));
+        selectedFoods = [...selectedFoods, ...allAvailable].slice(0, 6);
       }
       
-      const personalizedFoods = [...withIcons(mainFoods), ...withIcons(sideDishes), { name: '羊羹', img: '🍡' }];
+      // 価格計算
+      const totalPrice = selectedFoods.reduce((sum, name) => sum + (foodDatabase[name]?.price || 0), 0);
+      const additionalCost = Math.max(0, totalPrice - baseSetPrice);
+      
+      // パーソナライズ理由
+      if (person.tastePreference && person.tastePreference2) {
+        personalizations.push({ 
+          reason: `${person.tastePreference}と${person.tastePreference2}をバランスよく`, 
+          detail: '第一希望から3品、第二希望から2品を選定してバラエティ豊かに構成' 
+        });
+      } else if (person.tastePreference) {
+        personalizations.push({ 
+          reason: `${person.tastePreference}に対応`, 
+          detail: 'お好みに合わせた食品を選定' 
+        });
+      }
+      
+      if (allergyList.length > 0) {
+        personalizations.push({ 
+          reason: `${allergyList.join('、')}アレルギー対応`, 
+          detail: 'アレルゲンを含まない食品のみを厳選' 
+        });
+      }
+      
+      personalizations.push({
+        reason: `${person.age}・18-29歳向けに最適化`,
+        detail: '15L収納ボックスに効率よく収まる、3日分の備蓄を想定'
+      });
+      
+      // ベースアイテム
+      const baseItems = [
+        { name: '保存水 500ml (2本)', img: '💧' },
+        { name: '防災用品 (アルミブランケット、マスク、軍手、ホイッスル、除菌シート)', img: '🎒' },
+        { name: '簡易トイレ (10個)', img: '🚽' }
+      ];
+      
+      if (formData.livingEnvironment === 'mansion') {
+        baseItems.push({ name: 'BOS防臭袋（10枚）', img: '🛍️' });
+      }
+      
+      if (person.gender === '女性') {
+        baseItems.push({ name: '生理用品・衛生セット', img: '🧴' });
+      }
+      
+      // 選定食品を整形
+      const personalizedFoods = selectedFoods.map(name => ({
+        name,
+        img: foodDatabase[name]?.icon || '🍱',
+        price: foodDatabase[name]?.price || 0
+      }));
       
       boxes.push({
         personIndex: i,
         personLabel: personCount === 1 ? '' : `${i + 1}人目`,
         baseItems,
         personalizedFoods,
-        personalizations
+        personalizations,
+        foodTotalPrice: totalPrice,
+        additionalCost
       });
     }
     
-    // 防災タイプに応じたパーソナライゼーション（全体）
-    const disasterType = generateDisasterType();
-    
-    // 料金計算
-    const initialCost = 9980 * personCount;
+    // 全体の合計
+    const totalAdditionalCost = boxes.reduce((sum, box) => sum + box.additionalCost, 0);
+    const initialCost = 9980 * personCount + totalAdditionalCost;
     const annualCost = 5000 * personCount;
     
-    return { boxes, initialCost, annualCost, disasterType, personCount };
+    return {
+      disasterType: generateDisasterType(),
+      boxes,
+      personCount,
+      initialCost,
+      annualCost,
+      baseSetPrice,
+      totalAdditionalCost
+    };
   };
-
-  const submitToGoogleForm = async () => {
-    const rec = generateRecommendations();
-    const personCount = getPersonCount();
-    
-    // 各人の情報を整形
-    const personsDetail = formData.persons.slice(0, personCount).map((p, i) => {
-      return `【${personCount > 1 ? `${i + 1}人目` : '本人'}】年齢:${p.age} 性別:${p.gender} アレルギー:${p.allergies.join('・')}${p.allergyOther ? `・${p.allergyOther}` : ''} 食の好み:${p.foodPreference} 味:${p.tastePreference}/${p.tastePreference2}`;
-    }).join(' | ');
-    
-    // 各BOXの食品リスト
-    const baseItems = rec.boxes.map((box, i) => {
-      const label = personCount > 1 ? `[${i + 1}人目]` : '';
-      return `${label}${box.baseItems.map(item => item.name).join('、')}`;
-    }).join(' | ');
-    
-    const personalizedFoods = rec.boxes.map((box, i) => {
-      const label = personCount > 1 ? `[${i + 1}人目]` : '';
-      return `${label}${box.personalizedFoods.map(item => item.name).join('、')}`;
-    }).join(' | ');
-    
-    // URLパラメータとして送信
-    const params = new URLSearchParams({
-      name: formData.name || '未入力',
-      email: formData.email || '',
-      phone: formData.phone || '',
-      residents: formData.residents,
-      disasterType: rec.disasterType.type,
-      livingEnvironment: formData.livingEnvironment,
-      currentPreparation: formData.currentPreparation,
-      notes: formData.notes || 'なし',
-      initialCost: `¥${rec.initialCost.toLocaleString()} (${personCount}人分)`,
-      annualCost: `¥${rec.annualCost.toLocaleString()}/年 (${personCount}人分)`,
-      exchangeCycle: '3年ごとに交換',
-      personsDetail: personsDetail,
-      baseItems: baseItems,
-      personalizedFoods: personalizedFoods
-    });
-    
-    try {
-      // GETリクエストで送信（imgタグを使った送信方法）
-      const img = document.createElement('img');
-      img.style.display = 'none';
-      img.src = `https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec?${params.toString()}`;
-      document.body.appendChild(img);
-      
-      // 1秒後に削除
-      setTimeout(() => {
-        document.body.removeChild(img);
-      }, 1000);
-      
-      // 送信完了メッセージ表示
-      setCopied(true);
-      setTimeout(() => setCopied(false), 5000);
-      
-    } catch (error) {
-      console.error('送信エラー:', error);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 5000);
-    }
-  };
-
   useEffect(() => {
     if (step === 3) {
       const t = setTimeout(() => handleStepChange(4), 3000);
@@ -481,7 +467,7 @@ const ShukiApp = () => {
               <div className="mt-10 flex justify-end">
                 <button 
                   onClick={() => handleStepChange(3)} 
-                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || personCount === 0 || !formData.currentPreparation || 
+                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || !formData.residents || !formData.currentPreparation || 
                     formData.persons.slice(0, getPersonCount()).some(p => 
                       !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
                     )
@@ -584,12 +570,34 @@ const ShukiApp = () => {
                     </div>
 
                     <div className="bg-white rounded-2xl shadow-lg p-6">
-                      <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-orange-200"><Package className="w-6 h-6 text-orange-500" /><h5 className="text-xl font-bold text-slate-800">パーソナライズ食品</h5></div>
+                      <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-orange-200">
+                        <div className="flex items-center gap-2">
+                          <Package className="w-6 h-6 text-orange-500" />
+                          <h5 className="text-xl font-bold text-slate-800">パーソナライズ食品</h5>
+                        </div>
+                        {box.additionalCost > 0 && (
+                          <span className="text-sm text-orange-600 font-semibold">+¥{box.additionalCost}</span>
+                        )}
+                      </div>
                       <div className="space-y-3 max-h-96 overflow-y-auto">
                         {box.personalizedFoods.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg"><div className="text-4xl">{item.img}</div><span className="text-slate-700 font-medium">{item.name}</span></div>
+                          <div key={i} className="flex items-center justify-between gap-3 p-3 bg-orange-50 rounded-lg">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="text-4xl">{item.img}</div>
+                              <span className="text-slate-700 font-medium">{item.name}</span>
+                            </div>
+                            {item.price && (
+                              <span className="text-sm text-slate-600">¥{item.price}</span>
+                            )}
+                          </div>
                         ))}
                       </div>
+                      {box.foodTotalPrice && (
+                        <div className="mt-4 pt-4 border-t border-orange-200 flex justify-between items-center">
+                          <span className="text-sm text-slate-600">食品合計</span>
+                          <span className="text-lg font-bold text-orange-600">¥{box.foodTotalPrice}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -628,11 +636,22 @@ const ShukiApp = () => {
                     <span className="text-base sm:text-lg font-bold text-slate-800">💰 初期コスト（初回のみ）</span>
                     <span className="text-2xl sm:text-3xl font-bold text-orange-500">¥{rec.initialCost.toLocaleString()}</span>
                   </div>
-                  {rec.personCount > 1 && (
-                    <div className="text-xs sm:text-sm text-slate-600 pb-2">
-                      1人分 ¥9,980 × {rec.personCount}人 = ¥{rec.initialCost.toLocaleString()}
+                  <div className="text-xs sm:text-sm text-slate-600 space-y-1">
+                    <div className="flex justify-between">
+                      <span>基本セット（{rec.personCount}人分）</span>
+                      <span>¥{(9980 * rec.personCount).toLocaleString()}</span>
                     </div>
-                  )}
+                    {rec.totalAdditionalCost > 0 && (
+                      <div className="flex justify-between text-orange-600 font-semibold">
+                        <span>カスタマイズ追加料金</span>
+                        <span>+¥{rec.totalAdditionalCost.toLocaleString()}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between pt-2 border-t border-orange-200 font-bold text-base">
+                      <span>合計</span>
+                      <span>¥{rec.initialCost.toLocaleString()}</span>
+                    </div>
+                  </div>
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div>
                       <span className="text-xl sm:text-2xl font-bold text-slate-800">年間サブスク料金</span>
