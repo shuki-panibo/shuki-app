@@ -418,153 +418,20 @@ const ShukiApp = () => {
                   </>
                 )}
 
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-orange-500" />現在の備え <span className="text-orange-500">*</span></label>
-                  <div className="grid grid-cols-3 gap-3">
+                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-orange-500" />現在の備え <span className="text-orange-500">*</span></label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
                       { value: 'none', label: '全くない', emoji: '❌' },
                       { value: 'water', label: '水はある', emoji: '💧' },
                       { value: 'expired', label: '期限切れが心配', emoji: '📅' }
                     ].map(opt => (
-                      <button key={opt.value} onClick={() => setFormData({...formData, currentPreparation: opt.value})} className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.currentPreparation === opt.value ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-                        <span className="mr-2">{opt.emoji}</span>{opt.label}
+                      <button key={opt.value} onClick={() => setFormData({...formData, currentPreparation: opt.value})} className={`px-4 py-4 sm:py-3 rounded-xl font-medium transition-all min-h-[80px] sm:min-h-0 flex flex-col sm:flex-row items-center justify-center gap-2 ${formData.currentPreparation === opt.value ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+                        <span className="text-2xl sm:text-xl">{opt.emoji}</span>
+                        <span className="text-sm sm:text-base leading-tight text-center sm:text-left">{opt.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
-
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3">備考</label>
-                  <textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none resize-none" rows="3" placeholder="例：モバイルバッテリー、常備薬など" />
-                </div>
-              </div>
-
-              <div className="mt-10 flex justify-end">
-                <button 
-                  onClick={() => handleStepChange(3)} 
-                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || !formData.residents || !formData.currentPreparation || 
-                    formData.persons.slice(0, getPersonCount()).some(p => 
-                      !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
-                    )
-                  } 
-                  className="px-10 py-4 bg-orange-500 text-white text-lg font-bold rounded-xl hover:bg-orange-600 transition-all disabled:bg-slate-300 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-lg">
-                  AI診断結果を見る<Sparkles className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="min-h-screen flex items-center justify-center p-6">
-            <div className="text-center space-y-8">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-orange-500 to-orange-700 rounded-full animate-pulse">
-                <Sparkles className="w-12 h-12 text-white" />
-              </div>
-              <h2 className="text-3xl font-bold text-slate-800">AIが最適な防災セットを構成中...</h2>
-              <p className="text-lg text-slate-600">あなたの生活スタイルと防災ニーズを分析しています</p>
-              <div className="max-w-md mx-auto h-2 bg-slate-200 rounded-full overflow-hidden">
-                <div className="h-full bg-orange-500 rounded-full animate-pulse" style={{width: '70%'}}></div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div className="min-h-screen py-12 px-6">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4 leading-tight">
-                  あなたに最適な<br className="sm:hidden" />
-                  『護己セット』はこちら
-                </h2>
-                <p className="text-base sm:text-lg text-slate-600">
-                  {formData.name || 'あなた'}様のライフスタイルに<br className="sm:hidden" />合わせて厳選
-                </p>
-                {rec.personCount > 1 && (
-                  <p className="text-orange-600 font-bold mt-2 text-base sm:text-lg">
-                    🎁 {rec.personCount}人分の防災BOXを<br className="sm:hidden" />ご用意しました
-                  </p>
-                )}
-              </div>
-
-              {/* 防災タイプ表示 */}
-              <div className="bg-gradient-to-br from-orange-500 to-orange-700 rounded-3xl shadow-xl p-8 md:p-12 text-white mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <CheckCircle2 className="w-8 h-8" />
-                  <span className="text-lg font-medium opacity-90">あなたの防災タイプ</span>
-                </div>
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="text-5xl">{rec.disasterType.icon}</span>
-                  <h2 className="text-4xl md:text-5xl font-bold">{rec.disasterType.type}</h2>
-                </div>
-                <p className="text-base sm:text-lg md:text-xl opacity-90 leading-relaxed">
-                  {rec.disasterType.advice.split('。')[0]}。<br className="hidden sm:inline" />
-                  {rec.disasterType.advice.split('。')[1] && `${rec.disasterType.advice.split('。')[1]}。`}
-                </p>
-              </div>
-
-              {/* 人数分のBOX表示 */}
-              {rec.boxes.map((box, boxIndex) => (
-                <div key={boxIndex} className="mb-8">
-                  {rec.personCount > 1 && (
-                    <h3 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                      <Package className="w-6 h-6 text-orange-500" />
-                      {box.personLabel}の防災BOX
-                    </h3>
-                  )}
-                  
-                  <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
-                    <div className="flex items-center gap-3 mb-6">
-                      <User className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500" />
-                      <h4 className="text-lg sm:text-xl font-bold text-slate-800">✨ パーソナライズポイント</h4>
-                    </div>
-                    <div className="grid gap-4">
-                      {box.personalizations.map((item, i) => (
-                        <div key={i} className="bg-orange-50 rounded-xl p-4 sm:p-5 border-l-4 border-orange-500">
-                          <div className="flex items-start gap-3">
-                            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <h5 className="font-bold text-slate-800 mb-1 text-sm sm:text-base leading-relaxed">{item.reason}</h5>
-                              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{item.detail}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                      <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-slate-200"><Shield className="w-6 h-6 text-slate-700" /><h5 className="text-xl font-bold text-slate-800">ベースセット（必須）</h5></div>
-                      <div className="space-y-3">
-                        {box.baseItems.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg"><div className="text-4xl">{item.img}</div><span className="text-slate-700 font-medium">{item.name}</span></div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                      <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-orange-200"><Package className="w-6 h-6 text-orange-500" /><h5 className="text-xl font-bold text-slate-800">パーソナライズ食品</h5></div>
-                      <div className="space-y-3 max-h-96 overflow-y-auto">
-                        {box.personalizedFoods.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg"><div className="text-4xl">{item.img}</div><span className="text-slate-700 font-medium">{item.name}</span></div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* サブスクリプション情報 */}
-              <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-xl p-6 sm:p-8 mb-8">
-                <div className="text-center">
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">💳 年間サブスクリプション</h3>
-                  <p className="text-sm sm:text-base text-slate-300 mb-6 leading-relaxed">
-                    3年周期で新鮮な保存食を<br className="sm:hidden" />お届け
-                    {rec.personCount > 1 ? ` (${rec.personCount}人分)` : ''}
-                  </p>
-                  <div className="bg-orange-500 rounded-2xl p-6 sm:p-8 max-w-md mx-auto">
-                    <div className="text-white">
-                      <div className="text-4xl sm:text-5xl font-bold mb-2">¥{rec.annualCost.toLocaleString()}</div>
                       <div className="text-lg sm:text-xl mb-4">/年</div>
                       {rec.personCount > 1 && (
                         <div className="text-xs sm:text-sm opacity-75 mb-4">
