@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles } from 'lucide-react';
+import PolicyPage from './PolicyPage';
 
 const ShukiApp = () => {
   const [step, setStep] = useState(1);
   const [fadeIn, setFadeIn] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -278,6 +280,10 @@ const ShukiApp = () => {
   }, [step]);
 
   const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 5000, disasterType: {}, personCount: 1 };
+
+  if (showPolicy) {
+    return <PolicyPage onBack={() => setShowPolicy(false)} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -582,6 +588,44 @@ const ShukiApp = () => {
           </div>
         )}
       </div>
+
+      {/* フッター */}
+      <footer className="bg-slate-800 text-white py-8 mt-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8 mb-6">
+            <div>
+              <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-orange-400" />
+                護己 -Shuki-
+              </h3>
+              <p className="text-slate-300 text-sm">
+                日常に溶け込む、あなただけの防災。
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3">各種ポリシー</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <button onClick={() => setShowPolicy(true)} className="text-slate-300 hover:text-orange-400 transition-colors">
+                    利用規約・プライバシーポリシー
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3">お問い合わせ</h4>
+              <ul className="space-y-2 text-sm text-slate-300">
+                <li>公式LINE: <a href="https://lin.ee/v0KcwPS" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">@shuki</a></li>
+                <li>メール: shukipanibo@gmail.com</li>
+                <li>電話: 080-4249-1240</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-700 pt-6 text-center text-sm text-slate-400">
+            <p>© 2024 合同会社護己 All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
