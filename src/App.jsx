@@ -265,7 +265,7 @@ const ShukiApp = () => {
     // 全体の合計
     const totalAdditionalCost = boxes.reduce((sum, box) => sum + box.additionalCost, 0);
     const initialCost = 9980 * personCount + totalAdditionalCost;
-    const annualCost = 5000 * personCount;
+    const annualCost = 6000 * personCount;
     
     return {
       disasterType: generateDisasterType(),
@@ -284,21 +284,47 @@ const ShukiApp = () => {
     }
   }, [step]);
 
+
   const submitToGoogleForm = async () => {
     try {
       const rec = generateRecommendations();
       const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
       
+      // 交換日（3年後）
+      const exchangeDate = new Date();
+      exchangeDate.setFullYear(exchangeDate.getFullYear() + 3);
+      const exchangeDateStr = exchangeDate.toLocaleDateString('ja-JP');
+      
+      // 各人詳細
+      const personDetails = rec.boxes.map((box, idx) => {
+        const person = formData.persons[idx];
+        return `【${box.personLabel || '本人'}】年齢:${person.age} 性別:${person.gender} アレルギー:${person.allergies.join('、') || '特になし'} 食の好み:${person.foodPreference} 味:${person.tastePreference}${person.tastePreference2 ? '/' + person.tastePreference2 : ''}`;
+      }).join(' | ');
+      
+      // ベースアイテム
+      const baseItems = rec.boxes.map((box, idx) => {
+        return `[${box.personLabel || '本人'}]${box.baseItems.map(item => item.name).join('、')}`;
+      }).join(' | ');
+      
+      // 個別食品
+      const personalizedFoods = rec.boxes.map((box, idx) => {
+        return `[${box.personLabel || '本人'}]${box.personalizedFoods.map(item => item.name).join('、')}`;
+      }).join(' | ');
+      
       const formDataToSubmit = new FormData();
       formDataToSubmit.append('name', formData.name);
       formDataToSubmit.append('email', formData.email);
       formDataToSubmit.append('phone', formData.phone);
+      formDataToSubmit.append('disasterType', rec.disasterType.type);
       formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
-      formDataToSubmit.append('personCount', personCount);
       formDataToSubmit.append('currentPreparation', formData.currentPreparation);
       formDataToSubmit.append('notes', formData.notes);
       formDataToSubmit.append('initialCost', rec.initialCost);
       formDataToSubmit.append('annualCost', rec.annualCost);
+      formDataToSubmit.append('exchangeDate', exchangeDateStr);
+      formDataToSubmit.append('personDetails', personDetails);
+      formDataToSubmit.append('baseItems', baseItems);
+      formDataToSubmit.append('personalizedFoods', personalizedFoods);
       
       await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
       alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
@@ -307,8 +333,9 @@ const ShukiApp = () => {
       alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
     }
   };
+  };
 
-  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 5000, disasterType: {}, personCount: 1 };
+  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 };
 
   if (showPolicy) {
     return <PolicyPage onBack={() => setShowPolicy(false)} />;
@@ -630,7 +657,7 @@ const ShukiApp = () => {
                       <div className="text-lg sm:text-xl mb-4">/年</div>
                       {rec.personCount > 1 && (
                         <div className="text-xs sm:text-sm opacity-75 mb-4">
-                          1人あたり ¥5,000/年
+                          1人あたり ¥6,000/年
                         </div>
                       )}
                       <div className="text-xs sm:text-sm opacity-90 border-t border-white border-opacity-30 pt-4 space-y-2 text-left">
@@ -676,7 +703,7 @@ const ShukiApp = () => {
                   </div>
                   {rec.personCount > 1 && (
                     <div className="text-sm text-slate-600 pt-2">
-                      1人分 ¥5,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
+                      1人分 ¥6,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
                     </div>
                   )}
                 </div>
