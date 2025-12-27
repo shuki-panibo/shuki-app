@@ -287,7 +287,7 @@ const ShukiApp = () => {
   const submitToGoogleForm = async () => {
     try {
       const rec = generateRecommendations();
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbwNV7Gqxi9kFPpkWH0KW3lMPqc7rqXV6pOvFbg7ElJhS7zGO1L8lH_DhT_QLFGlTi6J/exec';
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
       
       const formDataToSubmit = new FormData();
       formDataToSubmit.append('name', formData.name);
