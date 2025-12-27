@@ -297,8 +297,8 @@ const ShukiApp = () => {
                 <Shield className="w-10 h-10 text-orange-500" />
               </div>
               <h1 className="text-5xl font-bold text-slate-800">護己 <span className="text-3xl text-slate-600">-Shuki-</span></h1>
-              <p className="text-2xl text-orange-500 font-medium">日常に溶け込む、あなただけの防災。</p>
-              <p className="text-lg text-slate-600 max-w-xl mx-auto">たった1分の質問に答えるだけで、AIがあなたの生活スタイルと防災ニーズに最適な備蓄を提案します。</p>
+              <p className="text-lg sm:text-xl md:text-2xl text-orange-500 font-medium leading-relaxed">日常に溶け込む、<br className="sm:hidden" />あなただけの防災。</p>
+              <p className="text-lg text-slate-600 max-w-xl mx-auto">たった1分の質問に答えるだけで、<br />AIがあなたの生活スタイルと<br className="sm:hidden" />防災ニーズに<br className="hidden sm:inline" />最適な備蓄を提案します。</p>
               <button onClick={() => handleStepChange(2)} className="mt-12 px-12 py-5 bg-orange-500 text-white text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-lg inline-flex items-center gap-3">
                 総合診断を始める<ArrowRight className="w-6 h-6" />
               </button>
@@ -629,7 +629,7 @@ const ShukiApp = () => {
                 護己 -Shuki-
               </h3>
               <p className="text-slate-300 text-sm">
-                日常に溶け込む、あなただけの防災。
+                日常に溶け込む、<br />あなただけの防災。
               </p>
             </div>
             <div>
