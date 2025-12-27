@@ -7,6 +7,7 @@ const ShukiApp = () => {
   const [fadeIn, setFadeIn] = useState(true);
   const [copied, setCopied] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -573,7 +574,36 @@ const ShukiApp = () => {
               </div>
 
               <div className="space-y-4">
-                <button onClick={submitToGoogleForm} className="w-full px-8 py-5 bg-orange-500 text-white text-xl font-bold rounded-xl hover:bg-orange-600 transition-all shadow-lg inline-flex items-center justify-center gap-3 transform hover:scale-105">
+                {/* 利用規約同意チェックボックス */}
+                <div className="bg-white rounded-xl p-4 border-2 border-slate-200">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-1 w-5 h-5 text-orange-500 rounded focus:ring-orange-500"
+                    />
+                    <span className="text-sm text-slate-700">
+                      <button
+                        onClick={() => setShowPolicy(true)}
+                        className="text-orange-500 hover:text-orange-600 underline font-medium"
+                      >
+                        利用規約・プライバシーポリシー
+                      </button>
+                      に同意します
+                    </span>
+                  </label>
+                </div>
+
+                <button 
+                  onClick={submitToGoogleForm} 
+                  disabled={!agreedToTerms}
+                  className={`w-full px-8 py-5 text-white text-xl font-bold rounded-xl transition-all shadow-lg inline-flex items-center justify-center gap-3 ${
+                    agreedToTerms 
+                      ? 'bg-orange-500 hover:bg-orange-600 transform hover:scale-105 cursor-pointer' 
+                      : 'bg-slate-300 cursor-not-allowed'
+                  }`}
+                >
                   <Mail className="w-6 h-6" />このプランで申し込む
                 </button>
                 {copied && (
