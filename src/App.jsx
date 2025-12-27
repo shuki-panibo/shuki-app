@@ -291,41 +291,50 @@ const ShukiApp = () => {
       <div className={`transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
         
         {step === 1 && (
-          <div className="min-h-screen flex items-center justify-center p-6">
-            <div className="max-w-2xl w-full text-center space-y-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-full mb-4">
-                <Shield className="w-10 h-10 text-orange-500" />
+          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+            <div className="max-w-2xl w-full text-center space-y-6 sm:space-y-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-slate-800 rounded-full mb-4">
+                <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-orange-500" />
               </div>
-              <h1 className="text-5xl font-bold text-slate-800">護己 <span className="text-3xl text-slate-600">-Shuki-</span></h1>
-              <p className="text-lg sm:text-xl md:text-2xl text-orange-500 font-medium leading-relaxed">日常に溶け込む、<br className="sm:hidden" />あなただけの防災。</p>
-              <p className="text-lg text-slate-600 max-w-xl mx-auto">たった1分の質問に答えるだけで、<br />AIがあなたの生活スタイルと<br className="sm:hidden" />防災ニーズに<br className="hidden sm:inline" />最適な備蓄を提案します。</p>
-              <button onClick={() => handleStepChange(2)} className="mt-12 px-12 py-5 bg-orange-500 text-white text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-lg inline-flex items-center gap-3">
-                総合診断を始める<ArrowRight className="w-6 h-6" />
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800">
+                護己 <span className="text-xl sm:text-2xl md:text-3xl text-slate-600">-Shuki-</span>
+              </h1>
+              <p className="text-lg sm:text-xl md:text-2xl text-orange-500 font-medium px-4 leading-relaxed">
+                日常に溶け込む、<br className="sm:hidden" />
+                あなただけの防災。
+              </p>
+              <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto px-4 leading-relaxed">
+                たった1分の質問に答えるだけで、<br />
+                AIがあなたの生活スタイルと<br className="sm:hidden" />防災ニーズに<br className="hidden sm:inline" />
+                最適な備蓄を提案します。
+              </p>
+              <button onClick={() => handleStepChange(2)} className="mt-8 sm:mt-12 px-8 sm:px-12 py-4 sm:py-5 bg-orange-500 text-white text-lg sm:text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-lg inline-flex items-center gap-3 min-h-[56px]">
+                総合診断を始める<ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
           </div>
         )}
 
         {step === 2 && (
-          <div className="min-h-screen flex items-center justify-center p-6 py-12">
-            <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-8 md:p-12">
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4"><Sparkles className="w-8 h-8 text-orange-500" /><h2 className="text-3xl font-bold text-slate-800">AI総合診断</h2></div>
-                <p className="text-slate-600">あなたの生活スタイルと防災ニーズから、最適な備蓄をご提案します。</p>
+          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12">
+            <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8 md:p-12">
+              <div className="mb-6 sm:mb-8">
+                <div className="flex items-center gap-3 mb-4"><Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-orange-500" /><h2 className="text-2xl sm:text-3xl font-bold text-slate-800">AI総合診断</h2></div>
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed">あなたの生活スタイルと防災ニーズから、最適な備蓄をご提案します。</p>
               </div>
 
-              <div className="space-y-8">
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3">お名前 <span className="text-orange-500">*</span></label>
-                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none" placeholder="山田 太郎" /></div>
+              <div className="space-y-6 sm:space-y-8">
+                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3">お名前 <span className="text-orange-500">*</span></label>
+                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]" placeholder="山田 太郎" /></div>
 
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Mail className="w-5 h-5 text-orange-500" />メールアドレス <span className="text-orange-500">*</span></label>
-                  <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none" placeholder="example@email.com" /></div>
+                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Mail className="w-5 h-5 text-orange-500" />メールアドレス <span className="text-orange-500">*</span></label>
+                  <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]" placeholder="example@email.com" /></div>
 
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3">電話番号 <span className="text-orange-500">*</span></label>
-                  <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none" placeholder="090-1234-5678" /></div>
+                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3">電話番号 <span className="text-orange-500">*</span></label>
+                  <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]" placeholder="090-1234-5678" /></div>
 
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Home className="w-5 h-5 text-orange-500" />居住環境 <span className="text-orange-500">*</span></label>
-                  <div className="grid grid-cols-3 gap-3">
+                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Home className="w-5 h-5 text-orange-500" />居住環境 <span className="text-orange-500">*</span></label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
                       { value: 'mansion', label: 'マンション', emoji: '🏢' },
                       { value: 'house', label: '戸建て', emoji: '🏠' },
@@ -463,9 +472,18 @@ const ShukiApp = () => {
           <div className="min-h-screen py-12 px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold text-slate-800 mb-4">あなたに最適な『護己セット』はこちら</h2>
-                <p className="text-lg text-slate-600">{formData.name || 'あなた'}様のライフスタイルに合わせて厳選</p>
-                {rec.personCount > 1 && <p className="text-orange-600 font-bold mt-2">🎁 {rec.personCount}人分の防災BOXをご用意しました</p>}
+                <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4 leading-tight">
+                  あなたに最適な<br className="sm:hidden" />
+                  『護己セット』はこちら
+                </h2>
+                <p className="text-base sm:text-lg text-slate-600">
+                  {formData.name || 'あなた'}様のライフスタイルに<br className="sm:hidden" />合わせて厳選
+                </p>
+                {rec.personCount > 1 && (
+                  <p className="text-orange-600 font-bold mt-2 text-base sm:text-lg">
+                    🎁 {rec.personCount}人分の防災BOXを<br className="sm:hidden" />ご用意しました
+                  </p>
+                )}
               </div>
 
               {/* 防災タイプ表示 */}
@@ -478,7 +496,10 @@ const ShukiApp = () => {
                   <span className="text-5xl">{rec.disasterType.icon}</span>
                   <h2 className="text-4xl md:text-5xl font-bold">{rec.disasterType.type}</h2>
                 </div>
-                <p className="text-lg md:text-xl opacity-90 leading-relaxed">{rec.disasterType.advice}</p>
+                <p className="text-base sm:text-lg md:text-xl opacity-90 leading-relaxed">
+                  {rec.disasterType.advice.split('。')[0]}。<br className="hidden sm:inline" />
+                  {rec.disasterType.advice.split('。')[1] && `${rec.disasterType.advice.split('。')[1]}。`}
+                </p>
               </div>
 
               {/* 人数分のBOX表示 */}
@@ -491,14 +512,20 @@ const ShukiApp = () => {
                     </h3>
                   )}
                   
-                  <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-                    <div className="flex items-center gap-3 mb-6"><User className="w-7 h-7 text-orange-500" /><h4 className="text-xl font-bold text-slate-800">パーソナライズポイント</h4></div>
-                    <div className="grid md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <User className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500" />
+                      <h4 className="text-lg sm:text-xl font-bold text-slate-800">✨ パーソナライズポイント</h4>
+                    </div>
+                    <div className="grid gap-4">
                       {box.personalizations.map((item, i) => (
-                        <div key={i} className="bg-orange-50 rounded-xl p-5 border-l-4 border-orange-500">
+                        <div key={i} className="bg-orange-50 rounded-xl p-4 sm:p-5 border-l-4 border-orange-500">
                           <div className="flex items-start gap-3">
-                            <CheckCircle2 className="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" />
-                            <div><h5 className="font-bold text-slate-800 mb-1">{item.reason}</h5><p className="text-sm text-slate-600">{item.detail}</p></div>
+                            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <h5 className="font-bold text-slate-800 mb-1 text-sm sm:text-base leading-relaxed">{item.reason}</h5>
+                              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{item.detail}</p>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -528,18 +555,25 @@ const ShukiApp = () => {
               ))}
 
               {/* サブスクリプション情報 */}
-              <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-xl p-8 mb-8">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-xl p-6 sm:p-8 mb-8">
                 <div className="text-center">
-                  <h3 className="text-3xl font-bold text-white mb-2">年間サブスクリプション</h3>
-                  <p className="text-slate-300 mb-6">3年周期で新鮮な保存食をお届け{rec.personCount > 1 ? ` (${rec.personCount}人分)` : ''}</p>
-                  <div className="bg-orange-500 rounded-2xl p-8 max-w-md mx-auto">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">💳 年間サブスクリプション</h3>
+                  <p className="text-sm sm:text-base text-slate-300 mb-6 leading-relaxed">
+                    3年周期で新鮮な保存食を<br className="sm:hidden" />お届け
+                    {rec.personCount > 1 ? ` (${rec.personCount}人分)` : ''}
+                  </p>
+                  <div className="bg-orange-500 rounded-2xl p-6 sm:p-8 max-w-md mx-auto">
                     <div className="text-white">
-                      <div className="text-5xl font-bold mb-2">¥{rec.annualCost.toLocaleString()}</div>
-                      <div className="text-xl mb-4">/年</div>
-                      {rec.personCount > 1 && <div className="text-sm opacity-75 mb-4">1人あたり ¥5,000/年</div>}
-                      <div className="text-sm opacity-90 border-t border-white border-opacity-30 pt-4">
-                        <p className="mb-2">✓ 3年ごとに新しい保存食をお届け</p>
-                        <p className="mb-2">✓ 古い食品の回収サービス付き</p>
+                      <div className="text-4xl sm:text-5xl font-bold mb-2">¥{rec.annualCost.toLocaleString()}</div>
+                      <div className="text-lg sm:text-xl mb-4">/年</div>
+                      {rec.personCount > 1 && (
+                        <div className="text-xs sm:text-sm opacity-75 mb-4">
+                          1人あたり ¥5,000/年
+                        </div>
+                      )}
+                      <div className="text-xs sm:text-sm opacity-90 border-t border-white border-opacity-30 pt-4 space-y-2 text-left">
+                        <p>✓ 3年ごとに新しい保存食を<br className="sm:hidden" />お届け</p>
+                        <p>✓ 古い食品の回収サービス付き</p>
                         <p>✓ 常に新鮮な備蓄をキープ</p>
                       </div>
                     </div>
@@ -547,20 +581,25 @@ const ShukiApp = () => {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-8 mb-8 border-2 border-orange-200">
+              <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-6 sm:p-8 mb-8 border-2 border-orange-200">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center pb-4 border-b border-orange-300">
-                    <span className="text-lg font-bold text-slate-800">初期コスト（初回のみ）</span>
-                    <span className="text-3xl font-bold text-orange-500">¥{rec.initialCost.toLocaleString()}</span>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-orange-300 gap-2">
+                    <span className="text-base sm:text-lg font-bold text-slate-800">💰 初期コスト（初回のみ）</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-orange-500">¥{rec.initialCost.toLocaleString()}</span>
                   </div>
                   {rec.personCount > 1 && (
-                    <div className="text-sm text-slate-600 pb-2">
+                    <div className="text-xs sm:text-sm text-slate-600 pb-2">
                       1人分 ¥9,980 × {rec.personCount}人 = ¥{rec.initialCost.toLocaleString()}
                     </div>
                   )}
-                  <div className="flex justify-between items-center">
-                    <div><span className="text-2xl font-bold text-slate-800">年間サブスク料金</span><p className="text-sm text-slate-600 mt-1">3年ごとに新鮮な保存食をお届け</p></div>
-                    <span className="text-4xl font-bold text-orange-500">¥{rec.annualCost.toLocaleString()}</span>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                      <span className="text-xl sm:text-2xl font-bold text-slate-800">年間サブスク料金</span>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                        3年ごとに新鮮な保存食を<br className="sm:hidden" />お届け
+                      </p>
+                    </div>
+                    <span className="text-3xl sm:text-4xl font-bold text-orange-500">¥{rec.annualCost.toLocaleString()}</span>
                   </div>
                   {rec.personCount > 1 && (
                     <div className="text-sm text-slate-600 pt-2">
@@ -569,7 +608,12 @@ const ShukiApp = () => {
                   )}
                 </div>
                 <div className="mt-6 bg-white bg-opacity-50 rounded-lg p-4">
-                  <p className="text-sm text-slate-700"><strong>サービス内容:</strong> 3年ごとに新しい保存食をお届けし、古い食品を回収します。常に新鮮な備蓄をキープできます。</p>
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    <strong>📦 サービス内容:</strong><br className="sm:hidden" /> 
+                    3年ごとに新しい保存食をお届けし、<br />
+                    古い食品を回収します。<br />
+                    常に新鮮な備蓄をキープできます。
+                  </p>
                 </div>
               </div>
 
@@ -621,15 +665,16 @@ const ShukiApp = () => {
 
       {/* フッター */}
       <footer className="bg-slate-800 text-white py-8 mt-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 mb-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-6">
             <div>
               <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-orange-400" />
                 護己 -Shuki-
               </h3>
-              <p className="text-slate-300 text-sm">
-                日常に溶け込む、<br />あなただけの防災。
+              <p className="text-slate-300 text-sm leading-relaxed">
+                日常に溶け込む、<br />
+                あなただけの防災。
               </p>
             </div>
             <div>
