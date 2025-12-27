@@ -8,6 +8,7 @@ const ShukiApp = () => {
   const [copied, setCopied] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [personCount, setPersonCount] = useState(0);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,12 +17,16 @@ const ShukiApp = () => {
     livingEnvironment: '',
     currentPreparation: '',
     notes: '',
-    // 人数分の個別情報（最大3人まで対応）
-    persons: [
-      { age: '', gender: '', allergies: [], allergyOther: '', foodPreference: '', tastePreference: '', tastePreference2: '' },
-      { age: '', gender: '', allergies: [], allergyOther: '', foodPreference: '', tastePreference: '', tastePreference2: '' },
-      { age: '', gender: '', allergies: [], allergyOther: '', foodPreference: '', tastePreference: '', tastePreference2: '' }
-    ]
+    // 人数分の個別情報（最大10人まで対応）
+    persons: Array(10).fill(null).map(() => ({ 
+      age: '', 
+      gender: '', 
+      allergies: [], 
+      allergyOther: '', 
+      foodPreference: '', 
+      tastePreference: '', 
+      tastePreference2: '' 
+    }))
   });
 
   const handleStepChange = (n) => {
@@ -56,11 +61,24 @@ const ShukiApp = () => {
     });
   };
 
+  const addPerson = () => {
+    if (personCount < 10) {
+      setPersonCount(personCount + 1);
+    }
+  };
+
+  const removePerson = (index) => {
+    if (personCount > 1) {
+      setPersonCount(personCount - 1);
+      // Reset the last person's data
+      const newPersons = [...formData.persons];
+      newPersons[personCount - 1] = { age: '', gender: '', allergies: [], allergyOther: '', foodPreference: '', tastePreference: '', tastePreference2: '' };
+      setFormData({...formData, persons: newPersons});
+    }
+  };
+
   const getPersonCount = () => {
-    if (formData.residents === '一人暮らし') return 1;
-    if (formData.residents === '二人暮らし') return 2;
-    if (formData.residents === '三人以上') return 3;
-    return 0;
+    return personCount;
   };
 
   const generateDisasterType = () => {
@@ -347,15 +365,37 @@ const ShukiApp = () => {
                   </div>
                 </div>
 
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Users className="w-5 h-5 text-orange-500" />居住人数 <span className="text-orange-500">*</span></label>
-                  <div className="grid grid-cols-3 gap-3">
-                    {['一人暮らし', '二人暮らし', '三人以上'].map(o => (
-                      <button key={o} onClick={() => setFormData({...formData, residents: o})} className={`px-6 py-4 rounded-xl font-medium transition-all ${formData.residents === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
+                <div>
+                  <label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-orange-500" />
+                    何人分の防災セットが必要ですか？ <span className="text-orange-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                    {[1, 2, 3].map(num => (
+                      <button 
+                        key={num} 
+                        onClick={() => setPersonCount(num)} 
+                        className={`px-6 py-4 rounded-xl font-medium transition-all ${personCount === num ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                      >
+                        {num}人
+                      </button>
                     ))}
+                    <button 
+                      onClick={addPerson}
+                      disabled={personCount >= 10}
+                      className={`px-4 py-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${personCount >= 10 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'}`}
+                    >
+                      <span className="text-xl">+</span> 人を追加
+                    </button>
                   </div>
+                  {personCount > 3 && (
+                    <div className="text-sm text-slate-600 bg-orange-50 rounded-lg p-3">
+                      現在 <strong className="text-orange-600">{personCount}人分</strong> 選択中（最大10人まで）
+                    </div>
+                  )}
                 </div>
 
-                {formData.residents && (
+                {personCount > 0 && (
                   <>
                     {[...Array(getPersonCount())].map((_, personIndex) => (
                       <div key={personIndex} className="bg-slate-50 rounded-2xl p-6 space-y-6">
