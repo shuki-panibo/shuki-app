@@ -326,6 +326,7 @@ const ShukiApp = () => {
       formDataToSubmit.append('baseItems', baseItems);
       formDataToSubmit.append('personalizedFoods', personalizedFoods);
       
+      console.log("送信データ:", Object.fromEntries(formDataToSubmit));
       await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
       alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
     } catch (error) {
