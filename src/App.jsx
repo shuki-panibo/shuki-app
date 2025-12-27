@@ -284,6 +284,30 @@ const ShukiApp = () => {
     }
   }, [step]);
 
+  const submitToGoogleForm = async () => {
+    try {
+      const rec = generateRecommendations();
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbwNV7Gqxi9kFPpkWH0KW3lMPqc7rqXV6pOvFbg7ElJhS7zGO1L8lH_DhT_QLFGlTi6J/exec';
+      
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append('name', formData.name);
+      formDataToSubmit.append('email', formData.email);
+      formDataToSubmit.append('phone', formData.phone);
+      formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
+      formDataToSubmit.append('personCount', personCount);
+      formDataToSubmit.append('currentPreparation', formData.currentPreparation);
+      formDataToSubmit.append('notes', formData.notes);
+      formDataToSubmit.append('initialCost', rec.initialCost);
+      formDataToSubmit.append('annualCost', rec.annualCost);
+      
+      await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
+      alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
+    } catch (error) {
+      console.error('Error!', error.message);
+      alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
+    }
+  };
+
   const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 5000, disasterType: {}, personCount: 1 };
 
   if (showPolicy) {
