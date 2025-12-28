@@ -126,6 +126,11 @@ const ShukiApp = () => {
       '塩ラーメン味': { category: '麺類', price: 580, allergens: ['小麦', '卵'], icon: '🍜' },
       'しょうゆラーメン味': { category: '麺類', price: 580, allergens: ['小麦', '卵'], icon: '🍜' },
       'うどん味': { category: '麺類', price: 580, allergens: ['小麦'], icon: '🍜' },
+      'カルボナーラ': { category: '麺類', price: 450, allergens: ['小麦', '乳製品'], icon: '🍝' },
+      'ペペロンチーノ': { category: '麺類', price: 450, allergens: [], icon: '🍝' },
+      'きのこのパスタ': { category: '麺類', price: 450, allergens: ['小麦', '乳製品'], icon: '🍝' },
+      '米粉でつくった山菜うどん': { category: '麺類', price: 450, allergens: [], icon: '🍜', allergenFree: true },
+      '米粉でつくったカレーうどん': { category: '麺類', price: 450, allergens: [], icon: '🍜', allergenFree: true },
       'あじのムース（にんじん付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🐟' },
       'いかのムース（ごぼう付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🦑' },
       '牛肉のムース（すき焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
@@ -225,7 +230,7 @@ const ShukiApp = () => {
       }
       
       personalizations.push({
-        reason: `${person.age}向けに最適化`,
+        reason: `${person.age}・18-29歳向けに最適化`,
         detail: '15L収納ボックスに効率よく収まる、3日分の備蓄を想定'
       });
       
@@ -265,7 +270,7 @@ const ShukiApp = () => {
     // 全体の合計
     const totalAdditionalCost = boxes.reduce((sum, box) => sum + box.additionalCost, 0);
     const initialCost = 9980 * personCount + totalAdditionalCost;
-    const annualCost = 6000 * personCount;
+    const annualCost = 5000 * personCount;
     
     return {
       disasterType: generateDisasterType(),
@@ -284,58 +289,7 @@ const ShukiApp = () => {
     }
   }, [step]);
 
-
-  const submitToGoogleForm = async () => {
-    try {
-      const rec = generateRecommendations();
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
-      
-      // 交換日（3年後）
-      const exchangeDate = new Date();
-      exchangeDate.setFullYear(exchangeDate.getFullYear() + 3);
-      const exchangeDateStr = exchangeDate.toLocaleDateString('ja-JP');
-      
-      // 各人詳細
-      const personDetails = rec.boxes.map((box, idx) => {
-        const person = formData.persons[idx];
-        return `【${box.personLabel || '本人'}】年齢:${person.age} 性別:${person.gender} アレルギー:${person.allergies.join('、') || '特になし'} 食の好み:${person.foodPreference} 味:${person.tastePreference}${person.tastePreference2 ? '/' + person.tastePreference2 : ''}`;
-      }).join(' | ');
-      
-      // ベースアイテム
-      const baseItems = rec.boxes.map((box, idx) => {
-        return `[${box.personLabel || '本人'}]${box.baseItems.map(item => item.name).join('、')}`;
-      }).join(' | ');
-      
-      // 個別食品
-      const personalizedFoods = rec.boxes.map((box, idx) => {
-        return `[${box.personLabel || '本人'}]${box.personalizedFoods.map(item => item.name).join('、')}`;
-      }).join(' | ');
-      
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.append('name', formData.name);
-      formDataToSubmit.append('email', formData.email);
-      formDataToSubmit.append('phone', formData.phone);
-      formDataToSubmit.append('disasterType', rec.disasterType.type);
-      formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
-      formDataToSubmit.append('currentPreparation', formData.currentPreparation);
-      formDataToSubmit.append('notes', formData.notes);
-      formDataToSubmit.append('initialCost', rec.initialCost);
-      formDataToSubmit.append('annualCost', rec.annualCost);
-      formDataToSubmit.append('exchangeDate', exchangeDateStr);
-      formDataToSubmit.append('personDetails', personDetails);
-      formDataToSubmit.append('baseItems', baseItems);
-      formDataToSubmit.append('personalizedFoods', personalizedFoods);
-      
-      console.log("送信データ:", Object.fromEntries(formDataToSubmit));
-      await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
-      alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
-    } catch (error) {
-      console.error('Error!', error.message);
-      alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
-    }
-  };
-
-  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 };
+  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 5000, disasterType: {}, personCount: 1 };
 
   if (showPolicy) {
     return <PolicyPage onBack={() => setShowPolicy(false)} />;
@@ -509,16 +463,12 @@ const ShukiApp = () => {
                     ))}
                   </div>
                 </div>
-
-                <div><label className="block text-lg font-semibold text-slate-700 mb-3">備考</label>
-                  <textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none resize-none" rows="3" placeholder="例：モバイルバッテリー、常備薬など" />
-                </div>
               </div>
 
               <div className="mt-10 flex justify-end">
                 <button 
                   onClick={() => handleStepChange(3)} 
-                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || personCount === 0 || !formData.currentPreparation || 
+                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || !formData.residents || !formData.currentPreparation || 
                     formData.persons.slice(0, getPersonCount()).some(p => 
                       !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
                     )
@@ -632,12 +582,23 @@ const ShukiApp = () => {
                       </div>
                       <div className="space-y-3 max-h-96 overflow-y-auto">
                         {box.personalizedFoods.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                            <div className="text-4xl">{item.img}</div>
-                            <span className="text-slate-700 font-medium">{item.name}</span>
+                          <div key={i} className="flex items-center justify-between gap-3 p-3 bg-orange-50 rounded-lg">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="text-4xl">{item.img}</div>
+                              <span className="text-slate-700 font-medium">{item.name}</span>
+                            </div>
+                            {item.price && (
+                              <span className="text-sm text-slate-600">¥{item.price}</span>
+                            )}
                           </div>
                         ))}
                       </div>
+                      {box.foodTotalPrice && (
+                        <div className="mt-4 pt-4 border-t border-orange-200 flex justify-between items-center">
+                          <span className="text-sm text-slate-600">食品合計</span>
+                          <span className="text-lg font-bold text-orange-600">¥{box.foodTotalPrice}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -657,7 +618,7 @@ const ShukiApp = () => {
                       <div className="text-lg sm:text-xl mb-4">/年</div>
                       {rec.personCount > 1 && (
                         <div className="text-xs sm:text-sm opacity-75 mb-4">
-                          1人あたり ¥6,000/年
+                          1人あたり ¥5,000/年
                         </div>
                       )}
                       <div className="text-xs sm:text-sm opacity-90 border-t border-white border-opacity-30 pt-4 space-y-2 text-left">
@@ -703,7 +664,7 @@ const ShukiApp = () => {
                   </div>
                   {rec.personCount > 1 && (
                     <div className="text-sm text-slate-600 pt-2">
-                      1人分 ¥6,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
+                      1人分 ¥5,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
                     </div>
                   )}
                 </div>
