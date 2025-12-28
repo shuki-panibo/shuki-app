@@ -288,7 +288,7 @@ const ShukiApp = () => {
   const submitToGoogleForm = async () => {
     try {
       const rec = generateRecommendations();
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbwj0PYKXzNdIMEgjUBVmL6FJy44OTj8s8SXgLkmhd4a_kSVVmB8jU2ocKiskjwmJOBQQg/exec';
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
       
       // 交換日（3年後）
       const exchangeDate = new Date();
