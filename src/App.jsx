@@ -522,7 +522,7 @@ const ShukiApp = () => {
                       食の好み <span className="text-orange-500">*</span>
                     </label>
                       <div className="grid grid-cols-2 gap-3">
-                        {['ご飯派', 'パン派'].map(o => (
+                        {['ご飯派', 'パン派', '麺派'].map(o => (
                           <button key={o} onClick={() => updatePerson(personIndex, 'foodPreference', o)} className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.persons[personIndex].foodPreference === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
                         ))}
                       </div>
