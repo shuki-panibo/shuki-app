@@ -311,8 +311,7 @@ const ShukiApp = () => {
   const submitToGoogleForm = async () => {
     try {
       const rec = generateRecommendations();
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJ
-x62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
       
       const exchangeDate = new Date();
       exchangeDate.setFullYear(exchangeDate.getFullYear() + 3);
