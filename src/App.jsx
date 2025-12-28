@@ -352,7 +352,7 @@ const ShukiApp = () => {
     }
   };
 
-  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 5000, disasterType: {}, personCount: 1 };
+  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 };
 
   if (showPolicy) {
     return <PolicyPage onBack={() => setShowPolicy(false)} />;
