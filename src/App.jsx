@@ -334,7 +334,6 @@ const ShukiApp = () => {
       alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
     }
   };
-  };
 
   const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 };
 
