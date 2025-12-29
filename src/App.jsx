@@ -308,51 +308,7 @@ const ShukiApp = () => {
     }
   }, [step]);
 
-  const submitToGoogleForm = async () => {
-    try {
-      const rec = generateRecommendations();
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
-      
-      const exchangeDate = new Date();
-      exchangeDate.setFullYear(exchangeDate.getFullYear() + 3);
-      const exchangeDateStr = exchangeDate.toLocaleDateString('ja-JP');
-      
-      const personDetails = rec.boxes.map((box, idx) => {
-        const person = formData.persons[idx];
-        return `【${box.personLabel || '本人'}】年齢:${person.age} 性別:${person.gender} アレルギー:${person.allergies.join('、') || '特になし'} 食の好み:${person.foodPreference} 味:${person.tastePreference}${person.tastePreference2 ? '/' + person.tastePreference2 : ''}`;
-      }).join(' | ');
-      
-      const baseItems = rec.boxes.map((box, idx) => {
-        return `[${box.personLabel || '本人'}]${box.baseItems.map(item => item.name).join('、')}`;
-      }).join(' | ');
-      
-      const personalizedFoods = rec.boxes.map((box, idx) => {
-        return `[${box.personLabel || '本人'}]${box.personalizedFoods.map(item => item.name).join('、')}`;
-      }).join(' | ');
-      
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.append('name', formData.name);
-      formDataToSubmit.append('email', formData.email);
-      formDataToSubmit.append('phone', formData.phone);
-      formDataToSubmit.append('disasterType', rec.disasterType.type);
-      formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
-      formDataToSubmit.append('currentPreparation', formData.currentPreparation);
-      formDataToSubmit.append('initialCost', rec.initialCost);
-      formDataToSubmit.append('annualCost', rec.annualCost);
-      formDataToSubmit.append('exchangeDate', exchangeDateStr);
-      formDataToSubmit.append('personDetails', personDetails);
-      formDataToSubmit.append('baseItems', baseItems);
-      formDataToSubmit.append('personalizedFoods', personalizedFoods);
-      
-      await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
-      alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
-    } catch (error) {
-      console.error('Error!', error.message);
-      alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
-    }
-  };
-
-  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 };
+  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 5000, disasterType: {}, personCount: 1 };
 
   if (showPolicy) {
     return <PolicyPage onBack={() => setShowPolicy(false)} />;
@@ -531,7 +487,7 @@ const ShukiApp = () => {
               <div className="mt-10 flex justify-end">
                 <button 
                   onClick={() => handleStepChange(3)} 
-                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || personCount === 0 || !formData.currentPreparation || 
+                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || !formData.residents || !formData.currentPreparation || 
                     formData.persons.slice(0, getPersonCount()).some(p => 
                       !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
                     )
@@ -645,23 +601,12 @@ const ShukiApp = () => {
                       </div>
                       <div className="space-y-3 max-h-96 overflow-y-auto">
                         {box.personalizedFoods.map((item, i) => (
-                          <div key={i} className="flex items-center justify-between gap-3 p-3 bg-orange-50 rounded-lg">
-                            <div className="flex items-center gap-3 flex-1">
-                              <div className="text-4xl">{item.img}</div>
-                              <span className="text-slate-700 font-medium">{item.name}</span>
-                            </div>
-                            {item.price && (
-                              <span className="text-sm text-slate-600">¥{item.price}</span>
-                            )}
+                          <div key={i} className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
+                            <div className="text-4xl">{item.img}</div>
+                            <span className="text-slate-700 font-medium">{item.name}</span>
                           </div>
                         ))}
                       </div>
-                      {box.foodTotalPrice && (
-                        <div className="mt-4 pt-4 border-t border-orange-200 flex justify-between items-center">
-                          <span className="text-sm text-slate-600">食品合計</span>
-                          <span className="text-lg font-bold text-orange-600">¥{box.foodTotalPrice}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
