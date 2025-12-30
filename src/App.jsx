@@ -135,8 +135,11 @@ const ShukiApp = () => {
       'いかのムース（ごぼう付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🦑' },
       '牛肉のムース（すき焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
       '豚肉のムース（しょうが焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
-      'スティックバウムクーヘン（プレーン）': { category: '甘味', price: 350, allergens: ['小麦', '卵', '乳製品'], icon: '🍰' },
-      'スティックバウムクーヘン（ココア）': { category: '甘味', price: 350, allergens: ['小麦', '卵', '乳製品'], icon: '🍰' },
+      'スティックバウムクーヘン（プレーン）': { category: 'パン・甘味', price: 350, allergens: ['小麦', '卵', '乳成分', '大豆'], icon: '🍰' },
+      'スティックバウムクーヘン（ココア）': { category: 'パン・甘味', price: 350, allergens: ['小麦', '卵', '乳成分', '大豆'], icon: '🍰' },
+      'パンですよ!5年保存 チョコチップ味': { category: 'パン・甘味', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞' },
+      'パンですよ!5年保存 レーズン味': { category: 'パン・甘味', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞' },
+      'パンですよ!5年保存 コーヒーナッツ味': { category: 'パン・甘味', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞' },
       'さつま芋のレモン煮': { category: '副菜', price: 400, allergens: [], icon: '🍠' },
       'ソフト金時豆': { category: '副菜', price: 380, allergens: [], icon: '🫘' },
       'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420, allergens: [], icon: '🎃', allergenFree: true }
@@ -179,7 +182,7 @@ const ShukiApp = () => {
       let selectedFoods = [];
       let personalizations = [];
       
-      // 食の好みによる優先商品選定（麺派の場合）
+      // 食の好みによる優先商品選定
       if (person.foodPreference === '麺派') {
         const noodleItems = ['カルボナーラ', 'ペペロンチーノ', 'きのこのパスタ', '米粉でつくった山菜うどん', '米粉でつくったカレーうどん', 'しょうゆラーメン味', '塩ラーメン味', 'うどん味'];
         const availableNoodles = noodleItems.filter(canEat);
@@ -189,6 +192,30 @@ const ShukiApp = () => {
         const pref1Foods = tasteGroups[person.tastePreference] || [];
         const availablePref1 = pref1Foods.filter(canEat).filter(f => !selectedFoods.includes(f));
         selectedFoods = [...selectedFoods, ...availablePref1.slice(0, 2)];
+      } else if (person.foodPreference === 'パン派') {
+        const breadItems = ['パンですよ!5年保存 チョコチップ味', 'パンですよ!5年保存 レーズン味', 'パンですよ!5年保存 コーヒーナッツ味', 'スティックバウムクーヘン（プレーン）', 'スティックバウムクーヘン（ココア）'];
+        const availableBreads = breadItems.filter(canEat);
+        
+        // 小麦または卵アレルギーの場合、パン商品が選べない
+        if (availableBreads.length === 0) {
+          // パンが食べられない場合は通常の選定
+          const pref1Foods = tasteGroups[person.tastePreference] || [];
+          const pref2Foods = person.tastePreference2 ? (tasteGroups[person.tastePreference2] || []) : [];
+          const availablePref1 = pref1Foods.filter(canEat);
+          const availablePref2 = pref2Foods.filter(canEat).filter(f => !availablePref1.includes(f));
+          selectedFoods = [
+            ...availablePref1.slice(0, 3),
+            ...availablePref2.slice(0, 2)
+          ];
+        } else {
+          // パン商品から3品
+          selectedFoods = [...availableBreads.slice(0, 3)];
+          
+          // 残り3品を味の好みから
+          const pref1Foods = tasteGroups[person.tastePreference] || [];
+          const availablePref1 = pref1Foods.filter(canEat).filter(f => !selectedFoods.includes(f));
+          selectedFoods = [...selectedFoods, ...availablePref1.slice(0, 3)];
+        }
       } else {
         // 好みの商品から選定
         const pref1Foods = tasteGroups[person.tastePreference] || [];
@@ -227,6 +254,19 @@ const ShukiApp = () => {
           reason: `麺派に特化した選定`, 
           detail: 'アレルギー対応の麺類を中心に、バラエティ豊かな麺料理を4品選定' 
         });
+      } else if (person.foodPreference === 'パン派') {
+        const allergyList = person.allergies.filter(a => a !== '特になし');
+        if (allergyList.includes('小麦') || allergyList.includes('卵')) {
+          personalizations.push({ 
+            reason: `パン派（アレルギー対応）`, 
+            detail: '小麦・卵アレルギーのため、パン商品は提供できません。代わりに食べやすい商品を選定しました' 
+          });
+        } else {
+          personalizations.push({ 
+            reason: `パン派に特化した選定`, 
+            detail: '5年保存可能なパンとバウムクーヘンを中心に、お好みの味付けの商品を3品選定' 
+          });
+        }
       }
       
       if (person.tastePreference && person.tastePreference2) {
@@ -289,7 +329,7 @@ const ShukiApp = () => {
     // 全体の合計
     const totalAdditionalCost = boxes.reduce((sum, box) => sum + box.additionalCost, 0);
     const initialCost = 9980 * personCount + totalAdditionalCost;
-    const annualCost = 6000 * personCount;
+    const annualCost = 5000 * personCount;
     
     return {
       disasterType: generateDisasterType(),
@@ -308,51 +348,7 @@ const ShukiApp = () => {
     }
   }, [step]);
 
-  const submitToGoogleForm = async () => {
-    try {
-      const rec = generateRecommendations();
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
-      
-      const exchangeDate = new Date();
-      exchangeDate.setFullYear(exchangeDate.getFullYear() + 3);
-      const exchangeDateStr = exchangeDate.toLocaleDateString('ja-JP');
-      
-      const personDetails = rec.boxes.map((box, idx) => {
-        const person = formData.persons[idx];
-        return `【${box.personLabel || '本人'}】年齢:${person.age} 性別:${person.gender} アレルギー:${person.allergies.join('、') || '特になし'} 食の好み:${person.foodPreference} 味:${person.tastePreference}${person.tastePreference2 ? '/' + person.tastePreference2 : ''}`;
-      }).join(' | ');
-      
-      const baseItems = rec.boxes.map((box, idx) => {
-        return `[${box.personLabel || '本人'}]${box.baseItems.map(item => item.name).join('、')}`;
-      }).join(' | ');
-      
-      const personalizedFoods = rec.boxes.map((box, idx) => {
-        return `[${box.personLabel || '本人'}]${box.personalizedFoods.map(item => item.name).join('、')}`;
-      }).join(' | ');
-      
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.append('name', formData.name);
-      formDataToSubmit.append('email', formData.email);
-      formDataToSubmit.append('phone', formData.phone);
-      formDataToSubmit.append('disasterType', rec.disasterType.type);
-      formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
-      formDataToSubmit.append('currentPreparation', formData.currentPreparation);
-      formDataToSubmit.append('initialCost', rec.initialCost);
-      formDataToSubmit.append('annualCost', rec.annualCost);
-      formDataToSubmit.append('exchangeDate', exchangeDateStr);
-      formDataToSubmit.append('personDetails', personDetails);
-      formDataToSubmit.append('baseItems', baseItems);
-      formDataToSubmit.append('personalizedFoods', personalizedFoods);
-      
-      await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
-      alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
-    } catch (error) {
-      console.error('Error!', error.message);
-      alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
-    }
-  };
-
-  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 };
+  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 5000, disasterType: {}, personCount: 1 };
 
   if (showPolicy) {
     return <PolicyPage onBack={() => setShowPolicy(false)} />;
@@ -531,7 +527,7 @@ const ShukiApp = () => {
               <div className="mt-10 flex justify-end">
                 <button 
                   onClick={() => handleStepChange(3)} 
-                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || personCount === 0 || !formData.currentPreparation || 
+                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || !formData.residents || !formData.currentPreparation || 
                     formData.persons.slice(0, getPersonCount()).some(p => 
                       !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
                     )
@@ -670,7 +666,7 @@ const ShukiApp = () => {
                       <div className="text-lg sm:text-xl mb-4">/年</div>
                       {rec.personCount > 1 && (
                         <div className="text-xs sm:text-sm opacity-75 mb-4">
-                          1人あたり ¥6,000/年
+                          1人あたり ¥5,000/年
                         </div>
                       )}
                       <div className="text-xs sm:text-sm opacity-90 border-t border-white border-opacity-30 pt-4 space-y-2 text-left">
@@ -716,7 +712,7 @@ const ShukiApp = () => {
                   </div>
                   {rec.personCount > 1 && (
                     <div className="text-sm text-slate-600 pt-2">
-                      1人分 ¥6,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
+                      1人分 ¥5,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
                     </div>
                   )}
                 </div>
