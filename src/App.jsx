@@ -670,7 +670,7 @@ const ShukiApp = () => {
                       <div className="text-lg sm:text-xl mb-4">/年</div>
                       {rec.personCount > 1 && (
                         <div className="text-xs sm:text-sm opacity-75 mb-4">
-                          1人あたり ¥5,000/年
+                          1人あたり ¥6,000/年
                         </div>
                       )}
                       <div className="text-xs sm:text-sm opacity-90 border-t border-white border-opacity-30 pt-4 space-y-2 text-left">
@@ -716,7 +716,7 @@ const ShukiApp = () => {
                   </div>
                   {rec.personCount > 1 && (
                     <div className="text-sm text-slate-600 pt-2">
-                      1人分 ¥5,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
+                      1人分 ¥6,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
                     </div>
                   )}
                 </div>
