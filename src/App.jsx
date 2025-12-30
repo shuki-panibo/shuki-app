@@ -329,7 +329,7 @@ const ShukiApp = () => {
     // 全体の合計
     const totalAdditionalCost = boxes.reduce((sum, box) => sum + box.additionalCost, 0);
     const initialCost = 9980 * personCount + totalAdditionalCost;
-    const annualCost = 5000 * personCount;
+    const annualCost = 6000 * personCount;
     
     return {
       disasterType: generateDisasterType(),
