@@ -5,6 +5,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 import AuthModal from './AuthModal';
 import PolicyPage from './PolicyPage';
+import MyPage from './MyPage';
 
 const ShukiApp = () => {
   const [step, setStep] = useState(1);
@@ -480,6 +481,25 @@ const ShukiApp = () => {
   const rec = diagnosisResult || (step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 });
 
   if (showPolicy) {
+
+  if (showMyPage) {
+    return (
+      <MyPage 
+        user={user} 
+        userDiagnoses={userDiagnoses} 
+        onLogout={handleLogout} 
+        onViewDiagnosis={(diagnosis) => {
+          setDiagnosisResult(diagnosis.result);
+          setShowMyPage(false);
+          handleStepChange(4);
+        }}
+        onBackToHome={() => {
+          setShowMyPage(false);
+          handleStepChange(1);
+        }}
+      />
+    );
+  }
     return <PolicyPage onBack={() => setShowPolicy(false)} />;
   }
 
@@ -488,6 +508,24 @@ const ShukiApp = () => {
       <div className={`transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
         
         {step === 1 && (
+          <>
+          {/* ヘッダー */}
+          {user && (
+            <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+              <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <UserCircle className="w-5 h-5 text-slate-600" />
+                  <span className="text-sm text-slate-600">{user.email}</span>
+                </div>
+                <button
+                  onClick={() => setShowMyPage(true)}
+                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all text-sm"
+                >
+                  マイページ
+                </button>
+              </div>
+            </div>
+          )}
           <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
             <div className="max-w-2xl w-full text-center space-y-6 sm:space-y-8">
               <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-slate-800 rounded-full mb-4">
@@ -510,6 +548,7 @@ const ShukiApp = () => {
               </button>
             </div>
           </div>
+          </>
         )}
 
         {step === 2 && (
