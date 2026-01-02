@@ -426,16 +426,8 @@ const ShukiApp = () => {
   useEffect(() => {
     if (step === 3) {
       const t = setTimeout(() => {
-        if (user) {
-          // すでにログイン済みの場合は直接保存して結果表示
-          const result = generateRecommendations();
-          saveDiagnosisToFirestore(user, result);
-          setDiagnosisResult(result);
-          handleStepChange(4);
-        } else {
-          // 未ログインの場合はログインモーダルを表示
-          setShowAuthModal(true);
-        }
+        // 常にログインモーダルを表示
+        setShowAuthModal(true);
       }, 3000);
       return () => clearTimeout(t);
     }
