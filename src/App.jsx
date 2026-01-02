@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles } from 'lucide-react';
+import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles, LogOut, UserCircle } from 'lucide-react';
+import { auth, db } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import AuthModal from './AuthModal';
 import PolicyPage from './PolicyPage';
 
 const ShukiApp = () => {
@@ -9,6 +13,11 @@ const ShukiApp = () => {
   const [showPolicy, setShowPolicy] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [personCount, setPersonCount] = useState(0);
+  const [user, setUser] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [diagnosisResult, setDiagnosisResult] = useState(null);
+  const [showMyPage, setShowMyPage] = useState(false);
+  const [userDiagnoses, setUserDiagnoses] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -341,12 +350,97 @@ const ShukiApp = () => {
       totalAdditionalCost
     };
   };
+  
+  // 認証状態の監視
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        loadUserDiagnoses(currentUser.uid);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+  
+  // 診断結果をFirestoreに保存
+  const saveDiagnosisToFirestore = async (user, result) => {
+    try {
+      await addDoc(collection(db, 'diagnoses'), {
+        userId: user.uid,
+        userEmail: user.email,
+        userName: formData.name,
+        timestamp: new Date(),
+        formData: formData,
+        result: result,
+        status: 'pending',
+        initialCost: result.initialCost,
+        annualCost: result.annualCost
+      });
+    } catch (error) {
+      console.error('診断結果の保存に失敗しました:', error);
+    }
+  };
+  
+  // ユーザーの診断履歴を取得
+  const loadUserDiagnoses = async (userId) => {
+    try {
+      const q = query(
+        collection(db, 'diagnoses'),
+        where('userId', '==', userId),
+        orderBy('timestamp', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      const diagnoses = [];
+      querySnapshot.forEach((doc) => {
+        diagnoses.push({ id: doc.id, ...doc.data() });
+      });
+      setUserDiagnoses(diagnoses);
+    } catch (error) {
+      console.error('診断履歴の取得に失敗しました:', error);
+    }
+  };
+  
+  // ログイン成功時の処理
+  const handleAuthSuccess = async (authUser) => {
+    setUser(authUser);
+    const result = generateRecommendations();
+    await saveDiagnosisToFirestore(authUser, result);
+    setDiagnosisResult(result);
+    setShowAuthModal(false);
+    handleStepChange(4);
+  };
+  
+  // ログアウト
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      setShowMyPage(false);
+      setUserDiagnoses([]);
+      handleStepChange(1);
+    } catch (error) {
+      console.error('ログアウトに失敗しました:', error);
+    }
+  };
+  
   useEffect(() => {
     if (step === 3) {
-      const t = setTimeout(() => handleStepChange(4), 3000);
+      const t = setTimeout(() => {
+        if (user) {
+          // すでにログイン済みの場合は直接保存して結果表示
+          const result = generateRecommendations();
+          saveDiagnosisToFirestore(user, result);
+          setDiagnosisResult(result);
+          handleStepChange(4);
+        } else {
+          // 未ログインの場合はログインモーダルを表示
+          setShowAuthModal(true);
+        }
+      }, 3000);
       return () => clearTimeout(t);
     }
   }, [step]);
+
 
   const submitToGoogleForm = async () => {
     try {
@@ -391,8 +485,7 @@ const ShukiApp = () => {
       alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
     }
   };
-
-  const rec = step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 };
+  const rec = diagnosisResult || (step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 });
 
   if (showPolicy) {
     return <PolicyPage onBack={() => setShowPolicy(false)} />;
@@ -854,6 +947,11 @@ const ShukiApp = () => {
           </div>
         </div>
       </footer>
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        onSuccess={handleAuthSuccess} 
+      />
     </div>
   );
 };
