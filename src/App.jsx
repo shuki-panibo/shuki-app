@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles, LogOut, UserCircle } from 'lucide-react';
-import { auth, db } from './firebase';
+
+import { auth, db } from './firebase';import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles, LogOut, UserCircle, MapPin, CreditCard } from 'lucide-react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 import AuthModal from './AuthModal';
@@ -19,6 +19,8 @@ const ShukiApp = () => {
   const [diagnosisResult, setDiagnosisResult] = useState(null);
   const [showMyPage, setShowMyPage] = useState(false);
   const [userDiagnoses, setUserDiagnoses] = useState([]);
+  const [userSelections, setUserSelections] = useState([]); 
+  const [paymentMethod, setPaymentMethod] = useState(null); // 'card' または 'bank'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,6 +29,13 @@ const ShukiApp = () => {
     livingEnvironment: '',
     currentPreparation: '',
     notes: '',
+    shippingAddress: {
+    postalCode: '',
+    prefecture: '',
+    city: '',
+    address: '',
+    building: ''
+  },
     // 人数分の個別情報（最大10人まで対応）
     persons: Array(10).fill(null).map(() => ({ 
       age: '', 
@@ -152,7 +161,55 @@ const ShukiApp = () => {
       'パンですよ!5年保存 コーヒーナッツ味': { category: 'パン・甘味', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞' },
       'さつま芋のレモン煮': { category: '副菜', price: 400, allergens: [], icon: '🍠' },
       'ソフト金時豆': { category: '副菜', price: 380, allergens: [], icon: '🫘' },
-      'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420, allergens: [], icon: '🎃', allergenFree: true }
+      'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420, allergens: [], icon: '🎃', allergenFree: true },
+      '尾西の五目ごはん': { category: '主食', price: 380, allergens: ['大豆', '小麦'], icon: '🍚' },
+      '尾西の松茸ごはん': { category: '主食', price: 480, allergens: ['乳製品', '大豆', '小麦'], icon: '🍚' },
+      '尾西のチキンライス': { category: '主食', price: 420, allergens: ['豚肉', '大豆', '鶏肉', '小麦'], icon: '🍚' },
+      '尾西のえびピラフ': { category: '主食', price: 420, allergens: ['乳製品', 'かに', 'えび', '豚肉', '鶏肉', '小麦'], icon: '🍚' },
+      '尾西の白飯': { category: '主食', price: 300, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西の赤飯': { category: '主食', price: 380, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のわかめごはん': { category: '主食', price: 380, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のきのこごはん': { category: '主食', price: 380, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西の山菜おこわ': { category: '主食', price: 380, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のたけのこごはん': { category: '主食', price: 480, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のアレルギー対応五目ごはん': { category: '主食', price: 400, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のドライカレー': { category: '主食', price: 420, allergens: [], icon: '🍛', allergenFree: true },
+      '白がゆ': { category: '主食', price: 280, allergens: [], icon: '🍚', allergenFree: true },
+      '梅がゆ': { category: '主食', price: 300, allergens: [], icon: '🍚', allergenFree: true },
+      '塩こんぶがゆ': { category: '主食', price: 320, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のレンジ＋（プラス）五目ごはん': { category: '主食', price: 450, allergens: ['大豆', '小麦'], icon: '🍚' },
+      '尾西のレンジ＋（プラス）チキンライス': { category: '主食', price: 450, allergens: ['豚肉', '大豆', '鶏肉', '小麦'], icon: '🍚' },
+      '尾西のレンジ＋（プラス）赤飯': { category: '主食', price: 450, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のレンジ＋（プラス）きのこごはん': { category: '主食', price: 450, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のレンジ＋（プラス）山菜おこわ': { category: '主食', price: 450, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のレンジ＋（プラス）たけのこごはん': { category: '主食', price: 480, allergens: [], icon: '🍚', allergenFree: true },
+      '尾西のレンジ＋（プラス）ドライカレー': { category: '主食', price: 450, allergens: [], icon: '🍛', allergenFree: true },
+      '携帯おにぎり 鮭': { category: '主食', price: 250, allergens: [], icon: '🍙', allergenFree: true },
+      '携帯おにぎり わかめ': { category: '主食', price: 250, allergens: [], icon: '🍙', allergenFree: true },
+      '携帯おにぎり 五目おこわ': { category: '主食', price: 250, allergens: [], icon: '🍙', allergenFree: true },
+      '携帯おにぎり 昆布': { category: '主食', price: 250, allergens: [], icon: '🍙', allergenFree: true },
+      '米粉でつくった山菜うどん': { category: '麺類', price: 500, allergens: [], icon: '🍜', allergenFree: true },
+      '米粉でつくったカレーうどん': { category: '麺類', price: 550, allergens: [], icon: '🍜', allergenFree: true },
+      '佐竹 白飯': { category: '主食', price: 330, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 五目ご飯': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 わかめご飯': { category: '主食', price: 390, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 青菜ご飯': { category: '主食', price: 390, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 梅昆布ご飯': { category: '主食', price: 440, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 鯛めし': { category: '主食', price: 440, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 梅じゃこご飯': { category: '主食', price: 390, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 根菜ご飯': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 ドライカレー': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍛' },
+      '佐竹 野菜ピラフ': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 チャーハン': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 白がゆ': { category: '主食', price: 310, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 梅がゆ': { category: '主食', price: 340, allergens: ['小麦'], icon: '🍚' },
+      '佐竹 青菜がゆ': { category: '主食', price: 340, allergens: ['小麦'], icon: '🍚' },
+      'カルボナーラ': { category: '麺類', price: 430, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍝' },
+      'ペペロンチーノ': { category: '麺類', price: 400, allergens: ['小麦'], icon: '🍝' },
+      'きのこのパスタ': { category: '麺類', price: 400, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍝' },
+      '醤油だし風味ラーメン': { category: '麺類', price: 300, allergens: ['さば', '大豆', '鶏肉', '小麦'], icon: '🍜' },
+      'チゲ風味ラーメン': { category: '麺類', price: 360, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍜' },
+      'シーフード風味ラーメン': { category: '麺類', price: 360, allergens: ['小麦', '乳製品', 'えび', 'かに', 'さば', '大豆', '鶏肉', '豚肉'], icon: '🍜' }
     };
 
     // 最安基本セット
@@ -188,106 +245,62 @@ const ShukiApp = () => {
         '甘いもの好き': ['さつま芋のレモン煮', 'スティックバウムクーヘン（プレーン）', 'スティックバウムクーヘン（ココア）', 'ソフト金時豆']
       };
       
-      // 選定ロジック
-      let selectedFoods = [];
+     // ★10品推奨ロジック（修正版）
+      let recommendedFoods = [];
       let personalizations = [];
       
       // 食の好みによる優先商品選定
       if (person.foodPreference === '麺派') {
-        const noodleItems = ['カルボナーラ', 'ペペロンチーノ', 'きのこのパスタ', '米粉でつくった山菜うどん', '米粉でつくったカレーうどん', 'しょうゆラーメン味', '塩ラーメン味', 'うどん味'];
-        const availableNoodles = noodleItems.filter(canEat);
-        selectedFoods = [...availableNoodles.slice(0, 4)]; // 麺類から4品
-        
-        // 残り2品を味の好みから
-        const pref1Foods = tasteGroups[person.tastePreference] || [];
-        const availablePref1 = pref1Foods.filter(canEat).filter(f => !selectedFoods.includes(f));
-        selectedFoods = [...selectedFoods, ...availablePref1.slice(0, 2)];
-      } else if (person.foodPreference === 'パン派') {
-        const breadItems = ['パンですよ!5年保存 チョコチップ味', 'パンですよ!5年保存 レーズン味', 'パンですよ!5年保存 コーヒーナッツ味', 'スティックバウムクーヘン（プレーン）', 'スティックバウムクーヘン（ココア）'];
-        const availableBreads = breadItems.filter(canEat);
-        
-        // 小麦または卵アレルギーの場合、パン商品が選べない
-        if (availableBreads.length === 0) {
-          // パンが食べられない場合は通常の選定
-          const pref1Foods = tasteGroups[person.tastePreference] || [];
-          const pref2Foods = person.tastePreference2 ? (tasteGroups[person.tastePreference2] || []) : [];
-          const availablePref1 = pref1Foods.filter(canEat);
-          const availablePref2 = pref2Foods.filter(canEat).filter(f => !availablePref1.includes(f));
-          selectedFoods = [
-            ...availablePref1.slice(0, 3),
-            ...availablePref2.slice(0, 2)
-          ];
-        } else {
-          // パン商品から3品
-          selectedFoods = [...availableBreads.slice(0, 3)];
-          
-          // 残り3品を味の好みから
-          const pref1Foods = tasteGroups[person.tastePreference] || [];
-          const availablePref1 = pref1Foods.filter(canEat).filter(f => !selectedFoods.includes(f));
-          selectedFoods = [...selectedFoods, ...availablePref1.slice(0, 3)];
-        }
-      } else {
-        // 好みの商品から選定
-        const pref1Foods = tasteGroups[person.tastePreference] || [];
-        const pref2Foods = person.tastePreference2 ? (tasteGroups[person.tastePreference2] || []) : [];
-        
-        // アレルギー対応商品を優先的に選ぶ
-        const availablePref1 = pref1Foods.filter(canEat);
-        const availablePref2 = pref2Foods.filter(canEat).filter(f => !availablePref1.includes(f));
-        
-        // 第一希望から3品、第二希望から2品を選定
-        selectedFoods = [
-          ...availablePref1.slice(0, 3),
-          ...availablePref2.slice(0, 2)
-        ];
-      }
-      
-      // 不足分を最安商品で埋める
-      if (selectedFoods.length < 6) {
-        const cheapSafe = baseSet.filter(canEat).filter(f => !selectedFoods.includes(f));
-        selectedFoods = [...selectedFoods, ...cheapSafe].slice(0, 6);
-      }
-      
-      // まだ6品に満たない場合、全商品から選ぶ
-      if (selectedFoods.length < 6) {
-        const allAvailable = Object.keys(foodDatabase).filter(canEat).filter(f => !selectedFoods.includes(f));
-        selectedFoods = [...selectedFoods, ...allAvailable].slice(0, 6);
-      }
-      
-      // 価格計算
-      const totalPrice = selectedFoods.reduce((sum, name) => sum + (foodDatabase[name]?.price || 0), 0);
-      const additionalCost = Math.max(0, totalPrice - baseSetPrice);
-      
-      // パーソナライズ理由
-      if (person.foodPreference === '麺派') {
+        const noodleItems = Object.keys(foodDatabase).filter(name => 
+          foodDatabase[name].category === '麺類' && canEat(name)
+        );
+        recommendedFoods = [...noodleItems.slice(0, 6)]; // 麺類から6品
         personalizations.push({ 
           reason: `麺派に特化した選定`, 
-          detail: 'アレルギー対応の麺類を中心に、バラエティ豊かな麺料理を4品選定' 
+          detail: 'アレルギー対応の麺類を中心に、バラエティ豊かな麺料理を選定' 
         });
       } else if (person.foodPreference === 'パン派') {
-        const allergyList = person.allergies.filter(a => a !== '特になし');
-        if (allergyList.includes('小麦') || allergyList.includes('卵')) {
-          personalizations.push({ 
-            reason: `パン派（アレルギー対応）`, 
-            detail: '小麦・卵アレルギーのため、パン商品は提供できません。代わりに食べやすい商品を選定しました' 
-          });
-        } else {
-          personalizations.push({ 
-            reason: `パン派に特化した選定`, 
-            detail: '5年保存可能なパンとバウムクーヘンを中心に、お好みの味付けの商品を3品選定' 
-          });
-        }
+        const breadItems = Object.keys(foodDatabase).filter(name => 
+          foodDatabase[name].category === 'パン・甘味' && canEat(name)
+        );
+        recommendedFoods = [...breadItems.slice(0, 4)]; // パン系から4品
+        personalizations.push({ 
+          reason: `パン派に特化した選定`, 
+          detail: '5年保存可能なパンを中心に選定' 
+        });
+      } else {
+        // 主食優先
+        const mainDishes = Object.keys(foodDatabase).filter(name => 
+          foodDatabase[name].category === '主食' && canEat(name)
+        );
+        recommendedFoods = [...mainDishes.slice(0, 5)]; // 主食から5品
       }
       
+      // 残りを味の好みから追加
+      const pref1Foods = tasteGroups[person.tastePreference] || [];
+      const pref2Foods = person.tastePreference2 ? (tasteGroups[person.tastePreference2] || []) : [];
+      const availablePref1 = pref1Foods.filter(canEat).filter(f => !recommendedFoods.includes(f));
+      const availablePref2 = pref2Foods.filter(canEat).filter(f => !recommendedFoods.includes(f) && !availablePref1.includes(f));
+      
+      recommendedFoods = [
+        ...recommendedFoods,
+        ...availablePref1.slice(0, 3),
+        ...availablePref2.slice(0, 2)
+      ];
+      
+      // 10品に調整
+      if (recommendedFoods.length < 10) {
+        const allAvailable = Object.keys(foodDatabase).filter(canEat).filter(f => !recommendedFoods.includes(f));
+        recommendedFoods = [...recommendedFoods, ...allAvailable].slice(0, 10);
+      } else {
+        recommendedFoods = recommendedFoods.slice(0, 10);
+      }
+      
+      // パーソナライズ理由の追加（既存のコードを維持）
       if (person.tastePreference && person.tastePreference2) {
         personalizations.push({ 
           reason: `${person.tastePreference}と${person.tastePreference2}をバランスよく`, 
           detail: '第一希望から3品、第二希望から2品を選定してバラエティ豊かに構成' 
-        });
-      } else if (person.tastePreference) {
-        personalizations.push({ 
-          reason: `${person.tastePreference}に対応`, 
-          detail: 'お好みに合わせた食品を選定' 
         });
       }
       
@@ -297,12 +310,7 @@ const ShukiApp = () => {
           detail: 'アレルゲンを含まない食品のみを厳選' 
         });
       }
-      
-      personalizations.push({
-        reason: `${person.age}向けに最適化`,
-        detail: '15L収納ボックスに効率よく収まる、3日分の備蓄を想定'
-      });
-      
+        
       // ベースアイテム
       const baseItems = [
         { name: '保存水 500ml (2本)', img: '💧' },
@@ -318,21 +326,20 @@ const ShukiApp = () => {
         baseItems.push({ name: '生理用品・衛生セット', img: '🧴' });
       }
       
-      // 選定食品を整形
-      const personalizedFoods = selectedFoods.map(name => ({
+     // ★推奨食品を整形（10品）
+      const recommendedItems = recommendedFoods.map(name => ({
         name,
         img: foodDatabase[name]?.icon || '🍱',
-        price: foodDatabase[name]?.price || 0
+        price: foodDatabase[name]?.price || 0,
+        category: foodDatabase[name]?.category || '主食'
       }));
       
       boxes.push({
         personIndex: i,
         personLabel: personCount === 1 ? '' : `${i + 1}人目`,
         baseItems,
-        personalizedFoods,
-        personalizations,
-        foodTotalPrice: totalPrice,
-        additionalCost
+        recommendedItems, // ★10品の推奨商品
+        personalizations
       });
     }
     
@@ -341,7 +348,7 @@ const ShukiApp = () => {
     const initialCost = 9980 * personCount + totalAdditionalCost;
     const annualCost = 6000 * personCount;
     
-    return {
+   return {
       disasterType: generateDisasterType(),
       boxes,
       personCount,
@@ -349,6 +356,167 @@ const ShukiApp = () => {
       annualCost,
       baseSetPrice,
       totalAdditionalCost
+    };  // ← この行を追加
+  };  // ← generateRecommendations関数の終わり
+  
+// ★新機能1: 選択をトグル（修正版）
+  const toggleSelection = (personIndex, itemName) => {
+    setUserSelections(prev => {
+      const newSelections = [...prev];
+      
+      // personIndex分の配列がない場合は初期化
+      while (newSelections.length <= personIndex) {
+        newSelections.push([]);
+      }
+      
+      if (!Array.isArray(newSelections[personIndex])) {
+        newSelections[personIndex] = [];
+      }
+      
+      const currentSelection = [...newSelections[personIndex]];
+      const index = currentSelection.indexOf(itemName);
+      
+      if (index > -1) {
+        // 選択解除
+        currentSelection.splice(index, 1);
+      } else {
+        // 選択追加（6品まで）
+        if (currentSelection.length < 6) {
+          currentSelection.push(itemName);
+        }
+      }
+      
+      newSelections[personIndex] = currentSelection;
+      return newSelections;
+    });
+  };
+// ★新機能2: 選択の検証（主食2品以上）- 5段階料金体系対応
+  const validateSelection = (personIndex) => {
+    const selected = userSelections[personIndex] || [];
+    
+    // 商品データベース（generateRecommendationsと同じ定義を使用）
+    const foodDatabase = {
+      '牛丼の具': { category: '主食', price: 550 },
+      'ポークカレー': { category: '主食', price: 480 },
+      '鮭粥': { category: '主食', price: 350 },
+      '白粥': { category: '主食', price: 280 },
+      '梅粥': { category: '主食', price: 280 },
+      '塩ラーメン味': { category: '麺類', price: 580 },
+      'しょうゆラーメン味': { category: '麺類', price: 580 },
+      'うどん味': { category: '麺類', price: 580 },
+      'カルボナーラ': { category: '麺類', price: 450 },
+      'ペペロンチーノ': { category: '麺類', price: 450 },
+      'きのこのパスタ': { category: '麺類', price: 450 },
+      '米粉でつくった山菜うどん': { category: '麺類', price: 450, allergenFree: true },
+      '米粉でつくったカレーうどん': { category: '麺類', price: 450, allergenFree: true },
+      'パンですよ!5年保存 チョコチップ味': { category: 'パン・甘味', price: 500 },
+      'パンですよ!5年保存 レーズン味': { category: 'パン・甘味', price: 500 },
+      'パンですよ!5年保存 コーヒーナッツ味': { category: 'パン・甘味', price: 500 },
+      'スティックバウムクーヘン（プレーン）': { category: 'パン・甘味', price: 350 },
+      'スティックバウムクーヘン（ココア）': { category: 'パン・甘味', price: 350 },
+      'さばの味噌煮': { category: 'おかず', price: 440 },
+      'いわしの煮付': { category: 'おかず', price: 440 },
+      '赤魚の煮付': { category: 'おかず', price: 480 },
+      'ハンバーグ煮込み': { category: 'おかず', price: 480 },
+      'ハンバーグ煮込みトマトソース': { category: 'おかず', price: 480 },
+      '中華風ミートボール': { category: 'おかず', price: 440 },
+      '肉じゃが': { category: 'おかず', price: 430 },
+      '筑前煮': { category: 'おかず', price: 430 },
+      '豚汁': { category: 'おかず', price: 420 },
+      'きんぴらごぼう': { category: 'おかず', price: 400 },
+      '鶏と野菜のトマト煮': { category: 'おかず', price: 480 },
+      '根菜のやわらか煮': { category: 'おかず', price: 430 },
+      '里芋の鶏そぼろ煮': { category: 'おかず', price: 430 },
+      'おでん': { category: 'おかず', price: 450 },
+      'けんちん汁': { category: 'おかず', price: 420 },
+      'さつま芋のレモン煮': { category: '副菜', price: 400 },
+      'ソフト金時豆': { category: '副菜', price: 380 },
+      'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420, allergenFree: true },
+      '尾西の五目ごはん': { category: '主食', price: 380 },
+      '尾西の松茸ごはん': { category: '主食', price: 480 },
+      '尾西のチキンライス': { category: '主食', price: 420 },
+      '尾西のえびピラフ': { category: '主食', price: 420 },
+      '尾西の白飯': { category: '主食', price: 300, allergenFree: true },
+      '尾西の赤飯': { category: '主食', price: 380, allergenFree: true },
+      '尾西のわかめごはん': { category: '主食', price: 380, allergenFree: true },
+      '尾西のきのこごはん': { category: '主食', price: 380, allergenFree: true },
+      '尾西の山菜おこわ': { category: '主食', price: 380, allergenFree: true },
+      '尾西のたけのこごはん': { category: '主食', price: 480, allergenFree: true },
+      '尾西のアレルギー対応五目ごはん': { category: '主食', price: 400, allergenFree: true },
+      '尾西のドライカレー': { category: '主食', price: 420, allergenFree: true },
+      '白がゆ': { category: '主食', price: 280, allergenFree: true },
+      '梅がゆ': { category: '主食', price: 300, allergenFree: true },
+      '塩こんぶがゆ': { category: '主食', price: 320, allergenFree: true },
+      '尾西のレンジ＋（プラス）五目ごはん': { category: '主食', price: 450 },
+      '尾西のレンジ＋（プラス）チキンライス': { category: '主食', price: 450 },
+      '尾西のレンジ＋（プラス）赤飯': { category: '主食', price: 450, allergenFree: true },
+      '尾西のレンジ＋（プラス）きのこごはん': { category: '主食', price: 450, allergenFree: true },
+      '尾西のレンジ＋（プラス）山菜おこわ': { category: '主食', price: 450, allergenFree: true },
+      '尾西のレンジ＋（プラス）たけのこごはん': { category: '主食', price: 480, allergenFree: true },
+      '尾西のレンジ＋（プラス）ドライカレー': { category: '主食', price: 450, allergenFree: true },
+      '携帯おにぎり 鮭': { category: '主食', price: 250, allergenFree: true },
+      '携帯おにぎり わかめ': { category: '主食', price: 250, allergenFree: true },
+      '携帯おにぎり 五目おこわ': { category: '主食', price: 250, allergenFree: true },
+      '携帯おにぎり 昆布': { category: '主食', price: 250, allergenFree: true },
+      '佐竹 白飯': { category: '主食', price: 330 },
+      '佐竹 五目ご飯': { category: '主食', price: 420 },
+      '佐竹 わかめご飯': { category: '主食', price: 390 },
+      '佐竹 青菜ご飯': { category: '主食', price: 390 },
+      '佐竹 梅昆布ご飯': { category: '主食', price: 440 },
+      '佐竹 鯛めし': { category: '主食', price: 440 },
+      '佐竹 梅じゃこご飯': { category: '主食', price: 390 },
+      '佐竹 根菜ご飯': { category: '主食', price: 420 },
+      '佐竹 ドライカレー': { category: '主食', price: 420 },
+      '佐竹 野菜ピラフ': { category: '主食', price: 420 },
+      '佐竹 チャーハン': { category: '主食', price: 420 },
+      '佐竹 白がゆ': { category: '主食', price: 310 },
+      '佐竹 梅がゆ': { category: '主食', price: 340 },
+      '佐竹 青菜がゆ': { category: '主食', price: 340 },
+      '醤油だし風味ラーメン': { category: '麺類', price: 300 },
+      'チゲ風味ラーメン': { category: '麺類', price: 360 },
+      'シーフード風味ラーメン': { category: '麺類', price: 360 },
+      'あじのムース（にんじん付）': { category: 'ムース', price: 450 },
+      'いかのムース（ごぼう付）': { category: 'ムース', price: 450 },
+      '牛肉のムース（すき焼き風）': { category: 'ムース', price: 480 },
+      '豚肉のムース（しょうが焼き風）': { category: 'ムース', price: 480 }
+    };
+    
+    if (selected.length === 0) {
+      return { isValid: false, selectedCount: 0, mainDishCount: 0, totalPrice: 0, additionalCost: 0 };
+    }
+    
+    // 選択された商品のカテゴリと価格をチェック
+    const mainDishCount = selected.filter(name => {
+      const food = foodDatabase[name];
+      return food && food.category === '主食';
+    }).length;
+    
+    // 価格計算
+    const totalPrice = selected.reduce((sum, name) => {
+      const food = foodDatabase[name];
+      return sum + (food?.price || 0);
+    }, 0);
+    
+    // ★5段階の料金体系で追加料金を計算
+    let additionalCost = 0;
+    if (totalPrice <= 2200) {
+      additionalCost = 710;  // 基本セット¥1,990 + ¥710 = ¥2,700
+    } else if (totalPrice <= 2500) {
+      additionalCost = 1010; // = ¥3,000
+    } else if (totalPrice <= 2800) {
+      additionalCost = 1510; // = ¥3,500
+    } else if (totalPrice <= 3100) {
+      additionalCost = 2010; // = ¥4,000
+    } else {
+      additionalCost = 2510; // = ¥4,500
+    }
+    
+    return {
+      isValid: selected.length === 6 && mainDishCount >= 2,
+      selectedCount: selected.length,
+      mainDishCount,
+      totalPrice,
+      additionalCost
     };
   };
   
@@ -400,7 +568,6 @@ const ShukiApp = () => {
       console.error('診断履歴の取得に失敗しました:', error);
     }
   };
-  
   // ログイン成功時の処理
   const handleAuthSuccess = async (authUser) => {
     setUser(authUser);
@@ -435,73 +602,103 @@ const ShukiApp = () => {
   }, [step]);
 
 
-  const submitToGoogleForm = async () => {
-    try {
-      const rec = generateRecommendations();
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyqItT0HJx62mAGgIo4RtPPhLgX8zHTM-FsrifVmwn1ZXTIG4J21PrKr5gZAUkehp_I/exec';
-      
-      const exchangeDate = new Date();
-      exchangeDate.setFullYear(exchangeDate.getFullYear() + 3);
-      const exchangeDateStr = exchangeDate.toLocaleDateString('ja-JP');
-      
-      const personDetails = rec.boxes.map((box, idx) => {
-        const person = formData.persons[idx];
-        return `【${box.personLabel || '本人'}】年齢:${person.age} 性別:${person.gender} アレルギー:${person.allergies.join('、') || '特になし'} 食の好み:${person.foodPreference} 味:${person.tastePreference}${person.tastePreference2 ? '/' + person.tastePreference2 : ''}`;
-      }).join(' | ');
-      
-      const baseItems = rec.boxes.map((box, idx) => {
-        return `[${box.personLabel || '本人'}]${box.baseItems.map(item => item.name).join('、')}`;
-      }).join(' | ');
-      
-      const personalizedFoods = rec.boxes.map((box, idx) => {
-        return `[${box.personLabel || '本人'}]${box.personalizedFoods.map(item => item.name).join('、')}`;
-      }).join(' | ');
-      
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.append('name', formData.name);
-      formDataToSubmit.append('email', formData.email);
-      formDataToSubmit.append('phone', formData.phone);
-      formDataToSubmit.append('disasterType', rec.disasterType.type);
-      formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
-      formDataToSubmit.append('currentPreparation', formData.currentPreparation);
-      formDataToSubmit.append('initialCost', rec.initialCost);
-      formDataToSubmit.append('annualCost', rec.annualCost);
-      formDataToSubmit.append('exchangeDate', exchangeDateStr);
-      formDataToSubmit.append('personDetails', personDetails);
-      formDataToSubmit.append('baseItems', baseItems);
-      formDataToSubmit.append('personalizedFoods', personalizedFoods);
-      
-      await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
-      alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
-    } catch (error) {
-      console.error('Error!', error.message);
-      alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
-    }
-  };
+ const submitToGoogleForm = async () => {
+  try {
+    console.log('🚀 申し込み処理開始');
+    const rec = generateRecommendations();
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwTecuqsmXSRAyREVlfUE3V-V8DzX6RLgPh4FpTGdbnzukJ1oTkeMlc-39gxgPq0JNM/exec'
+    
+    const exchangeDate = new Date();
+    exchangeDate.setFullYear(exchangeDate.getFullYear() + 3);
+    const exchangeDateStr = exchangeDate.toLocaleDateString('ja-JP');
+    
+    const personDetails = rec.boxes.map((box, idx) => {
+      const person = formData.persons[idx];
+      return `【${box.personLabel || '本人'}】年齢:${person.age} 性別:${person.gender} アレルギー:${person.allergies.join('、') || '特になし'} 食の好み:${person.foodPreference} 味:${person.tastePreference}${person.tastePreference2 ? '/' + person.tastePreference2 : ''}`;
+    }).join(' | ');
+    
+    const baseItems = rec.boxes.map((box, idx) => {
+      return `[${box.personLabel || '本人'}]${box.baseItems.map(item => item.name).join('、')}`;
+    }).join(' | ');
+    
+    const recommendedFoods = rec.boxes.map((box, idx) => {
+      return `[${box.personLabel || '本人'}]${box.recommendedItems.map(item => item.name).join('、')}`;
+    }).join(' | ');
+    
+    // ★ここで住所を整形（関数の中で定義）
+    const shippingAddressText = `〒${formData.shippingAddress.postalCode} ${formData.shippingAddress.prefecture}${formData.shippingAddress.city}${formData.shippingAddress.address}${formData.shippingAddress.building ? ' ' + formData.shippingAddress.building : ''}`;
+    
+    const additionalCosts = rec.boxes.map((box, idx) => {
+  const validation = validateSelection(idx);
+  return validation.additionalCost;
+});
+
+    console.log('📦 データ準備完了:', {
+  name: formData.name,
+  email: formData.email,
+  shippingAddress: shippingAddressText,
+  initialCost: rec.initialCost,
+  annualCost: rec.annualCost,
+  additionalCosts: additionalCosts
+});
+
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append('name', formData.name);
+    formDataToSubmit.append('email', formData.email);
+    formDataToSubmit.append('phone', formData.phone);
+    formDataToSubmit.append('disasterType', rec.disasterType.type);
+    formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
+    formDataToSubmit.append('currentPreparation', formData.currentPreparation);
+    formDataToSubmit.append('initialCost', rec.initialCost.toString());
+formDataToSubmit.append('annualCost', rec.annualCost.toString());
+    formDataToSubmit.append('exchangeDate', exchangeDateStr);
+    formDataToSubmit.append('personDetails', personDetails);
+    formDataToSubmit.append('baseItems', baseItems);
+    formDataToSubmit.append('recommendedFoods', recommendedFoods);
+    formDataToSubmit.append('shippingAddress', shippingAddressText);
+    formDataToSubmit.append('postalCode', formData.shippingAddress.postalCode);
+    formDataToSubmit.append('prefecture', formData.shippingAddress.prefecture);
+    formDataToSubmit.append('city', formData.shippingAddress.city);
+    formDataToSubmit.append('address', formData.shippingAddress.address);
+    formDataToSubmit.append('building', formData.shippingAddress.building || '');
+    formDataToSubmit.append('additionalCosts', JSON.stringify(additionalCosts));
+    formDataToSubmit.append('paymentMethod', paymentMethod);
+    
+    console.log('📡 Google Apps Scriptにリクエスト送信中...');
+    
+    await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
+    
+    console.log('✅ 送信完了');
+    alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
+  } catch (error) {
+    console.error('❌ Error!', error.message);
+    alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
+  }
+};
   const rec = diagnosisResult || (step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 });
 
-  if (showPolicy) {
+ if (showPolicy) {
+  return <PolicyPage onBack={() => setShowPolicy(false)} />;
+}
 
-  if (showMyPage) {
-    return (
-      <MyPage 
-        user={user} 
-        userDiagnoses={userDiagnoses} 
-        onLogout={handleLogout} 
-        onViewDiagnosis={(diagnosis) => {
-          setDiagnosisResult(diagnosis.result);
-          setShowMyPage(false);
-          handleStepChange(4);
-        }}
-        onBackToHome={() => {
-          setShowMyPage(false);
-          handleStepChange(1);
-        }}
-      />
-    );
-  }
-    return <PolicyPage onBack={() => setShowPolicy(false)} />;
-  }
+if (showMyPage) {
+  return (
+    <MyPage 
+      user={user} 
+      userDiagnoses={userDiagnoses} 
+      onLogout={handleLogout} 
+      onViewDiagnosis={(diagnosis) => {
+        setDiagnosisResult(diagnosis.result);
+        setShowMyPage(false);
+        handleStepChange(4);
+      }}
+      onBackToHome={() => {
+        setShowMyPage(false);
+        handleStepChange(1);
+      }}
+    />
+  );
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -691,19 +888,121 @@ const ShukiApp = () => {
                   </div>
                 </div>
               </div>
+<div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 space-y-6 mt-8">
+
+  <div className="flex items-center gap-3 mb-4">
+    <MapPin className="w-6 h-6 text-blue-600" />
+    <h3 className="text-xl font-bold text-slate-800">配送先住所</h3>
+  </div>
+
+  {/* 郵便番号 */}
+  <div>
+    <label className="block text-base font-semibold text-slate-700 mb-3">
+      郵便番号 <span className="text-orange-500">*</span>
+    </label>
+    <input
+      type="text"
+      value={formData.shippingAddress.postalCode}
+      onChange={(e) => setFormData({
+        ...formData, 
+        shippingAddress: {...formData.shippingAddress, postalCode: e.target.value}
+      })}
+      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
+      placeholder="123-4567"
+    />
+  </div>
+
+  {/* 都道府県 */}
+  <div>
+    <label className="block text-base font-semibold text-slate-700 mb-3">
+      都道府県 <span className="text-orange-500">*</span>
+    </label>
+    <input
+      type="text"
+      value={formData.shippingAddress.prefecture}
+      onChange={(e) => setFormData({
+        ...formData, 
+        shippingAddress: {...formData.shippingAddress, prefecture: e.target.value}
+      })}
+      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
+      placeholder="東京都"
+    />
+  </div>
+
+  {/* 市区町村 */}
+  <div>
+    <label className="block text-base font-semibold text-slate-700 mb-3">
+      市区町村 <span className="text-orange-500">*</span>
+    </label>
+    <input
+      type="text"
+      value={formData.shippingAddress.city}
+      onChange={(e) => setFormData({
+        ...formData, 
+        shippingAddress: {...formData.shippingAddress, city: e.target.value}
+      })}
+      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
+      placeholder="渋谷区"
+    />
+  </div>
+
+  {/* 番地 */}
+  <div>
+    <label className="block text-base font-semibold text-slate-700 mb-3">
+      番地 <span className="text-orange-500">*</span>
+    </label>
+    <input
+      type="text"
+      value={formData.shippingAddress.address}
+      onChange={(e) => setFormData({
+        ...formData, 
+        shippingAddress: {...formData.shippingAddress, address: e.target.value}
+      })}
+      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
+      placeholder="1-2-3"
+    />
+  </div>
+
+  {/* 建物名・部屋番号 */}
+  <div>
+    <label className="block text-base font-semibold text-slate-700 mb-3">
+      建物名・部屋番号
+    </label>
+    <input
+      type="text"
+      value={formData.shippingAddress.building}
+      onChange={(e) => setFormData({
+        ...formData, 
+        shippingAddress: {...formData.shippingAddress, building: e.target.value}
+      })}
+      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
+      placeholder="〇〇マンション101号室（任意）"
+    />
+  </div>
+</div>
 
               <div className="mt-10 flex justify-end">
-                <button 
-                  onClick={() => handleStepChange(3)} 
-                  disabled={!formData.name || !formData.email || !formData.phone || !formData.livingEnvironment || personCount === 0 || !formData.currentPreparation || 
-                    formData.persons.slice(0, getPersonCount()).some(p => 
-                      !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
-                    )
-                  } 
-                  className="px-10 py-4 bg-orange-500 text-white text-lg font-bold rounded-xl hover:bg-orange-600 transition-all disabled:bg-slate-300 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-lg">
-                  AI診断結果を見る<Sparkles className="w-5 h-5" />
-                </button>
-              </div>
+  <button 
+    onClick={() => handleStepChange(3)} 
+    disabled={
+      !formData.name || 
+      !formData.email || 
+      !formData.phone || 
+      !formData.livingEnvironment || 
+      personCount === 0 || 
+      !formData.currentPreparation ||
+      !formData.shippingAddress.postalCode ||
+      !formData.shippingAddress.prefecture ||
+      !formData.shippingAddress.city ||
+      !formData.shippingAddress.address ||
+      formData.persons.slice(0, getPersonCount()).some(p => 
+        !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
+      )
+    } 
+    className="px-10 py-4 bg-orange-500 text-white text-lg font-bold rounded-xl hover:bg-orange-600 transition-all disabled:bg-slate-300 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-lg">
+    AI診断結果を見る<Sparkles className="w-5 h-5" />
+  </button>
+</div>
             </div>
           </div>
         )}
@@ -723,222 +1022,349 @@ const ShukiApp = () => {
           </div>
         )}
 
-        {step === 4 && (
-          <div className="min-h-screen py-12 px-6">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4 leading-tight">
-                  あなたに最適な<br className="sm:hidden" />
-                  『護己セット』はこちら
-                </h2>
-                <p className="text-base sm:text-lg text-slate-600">
-                  {formData.name || 'あなた'}様のライフスタイルに<br className="sm:hidden" />合わせて厳選
-                </p>
-                {rec.personCount > 1 && (
-                  <p className="text-orange-600 font-bold mt-2 text-base sm:text-lg">
-                    🎁 {rec.personCount}人分の防災BOXを<br className="sm:hidden" />ご用意しました
-                  </p>
-                )}
+{step === 4 && (
+  <div className="min-h-screen py-12 px-6">
+    <div className="max-w-6xl mx-auto">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4 leading-tight">
+          あなたに最適な<br className="sm:hidden" />
+          『護己セット』はこちら
+        </h2>
+        <p className="text-base sm:text-lg text-slate-600">
+          {formData.name || 'あなた'}様のライフスタイルに<br className="sm:hidden" />合わせて厳選
+        </p>
+        {rec.personCount > 1 && (
+          <p className="text-orange-600 font-bold mt-2 text-base sm:text-lg">
+            🎁 {rec.personCount}人分の防災BOXを<br className="sm:hidden" />ご用意しました
+          </p>
+        )}
+      </div>
+
+      {/* 防災タイプ表示 */}
+      <div className="bg-gradient-to-br from-orange-500 to-orange-700 rounded-3xl shadow-xl p-8 md:p-12 text-white mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <CheckCircle2 className="w-8 h-8" />
+          <span className="text-lg font-medium opacity-90">あなたの防災タイプ</span>
+        </div>
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-5xl">{rec.disasterType.icon}</span>
+          <h2 className="text-4xl md:text-5xl font-bold">{rec.disasterType.type}</h2>
+        </div>
+        <p className="text-base sm:text-lg md:text-xl opacity-90 leading-relaxed">
+          {rec.disasterType.advice.split('。')[0]}。<br className="hidden sm:inline" />
+          {rec.disasterType.advice.split('。')[1] && `${rec.disasterType.advice.split('。')[1]}。`}
+        </p>
+      </div>
+
+      {/* 人数分のBOX表示 */}
+      {rec.boxes.map((box, boxIndex) => {
+        const validation = validateSelection(boxIndex);
+        const isSelected = (itemName) => (userSelections[boxIndex] || []).includes(itemName);
+
+        return (
+          <div key={boxIndex} className="mb-8">
+            {rec.personCount > 1 && (
+              <h3 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <Package className="w-6 h-6 text-orange-500" />
+                {box.personLabel}の防災BOX
+              </h3>
+            )}
+            
+            {/* パーソナライズポイント */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
+              <div className="flex items-center gap-3 mb-6">
+                <User className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500" />
+                <h4 className="text-lg sm:text-xl font-bold text-slate-800">✨ パーソナライズポイント</h4>
+              </div>
+              <div className="grid gap-4">
+                {box.personalizations.map((item, i) => (
+                  <div key={i} className="bg-orange-50 rounded-xl p-4 sm:p-5 border-l-4 border-orange-500">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h5 className="font-bold text-slate-800 mb-1 text-sm sm:text-base leading-relaxed">{item.reason}</h5>
+                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{item.detail}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* ベースセット */}
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-slate-200">
+                  <Shield className="w-6 h-6 text-slate-700" />
+                  <h5 className="text-xl font-bold text-slate-800">ベースセット（必須）</h5>
+                </div>
+                <div className="space-y-3">
+                  {box.baseItems.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                      <div className="text-4xl">{item.img}</div>
+                      <span className="text-slate-700 font-medium">{item.name}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* 防災タイプ表示 */}
-              <div className="bg-gradient-to-br from-orange-500 to-orange-700 rounded-3xl shadow-xl p-8 md:p-12 text-white mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <CheckCircle2 className="w-8 h-8" />
-                  <span className="text-lg font-medium opacity-90">あなたの防災タイプ</span>
-                </div>
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="text-5xl">{rec.disasterType.icon}</span>
-                  <h2 className="text-4xl md:text-5xl font-bold">{rec.disasterType.type}</h2>
-                </div>
-                <p className="text-base sm:text-lg md:text-xl opacity-90 leading-relaxed">
-                  {rec.disasterType.advice.split('。')[0]}。<br className="hidden sm:inline" />
-                  {rec.disasterType.advice.split('。')[1] && `${rec.disasterType.advice.split('。')[1]}。`}
-                </p>
-              </div>
-
-              {/* 人数分のBOX表示 */}
-              {rec.boxes.map((box, boxIndex) => (
-                <div key={boxIndex} className="mb-8">
-                  {rec.personCount > 1 && (
-                    <h3 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+              {/* ★新UI: 10品から6品選択 */}
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <div className="mb-4 pb-3 border-b-2 border-orange-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
                       <Package className="w-6 h-6 text-orange-500" />
-                      {box.personLabel}の防災BOX
-                    </h3>
-                  )}
-                  
-                  <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
-                    <div className="flex items-center gap-3 mb-6">
-                      <User className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500" />
-                      <h4 className="text-lg sm:text-xl font-bold text-slate-800">✨ パーソナライズポイント</h4>
+                      <h5 className="text-xl font-bold text-slate-800">食品を選択</h5>
                     </div>
-                    <div className="grid gap-4">
-                      {box.personalizations.map((item, i) => (
-                        <div key={i} className="bg-orange-50 rounded-xl p-4 sm:p-5 border-l-4 border-orange-500">
-                          <div className="flex items-start gap-3">
-                            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <h5 className="font-bold text-slate-800 mb-1 text-sm sm:text-base leading-relaxed">{item.reason}</h5>
-                              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{item.detail}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                      <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-slate-200"><Shield className="w-6 h-6 text-slate-700" /><h5 className="text-xl font-bold text-slate-800">ベースセット（必須）</h5></div>
-                      <div className="space-y-3">
-                        {box.baseItems.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg"><div className="text-4xl">{item.img}</div><span className="text-slate-700 font-medium">{item.name}</span></div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                      <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-orange-200">
-                        <div className="flex items-center gap-2">
-                          <Package className="w-6 h-6 text-orange-500" />
-                          <h5 className="text-xl font-bold text-slate-800">パーソナライズ食品</h5>
-                        </div>
-                        {box.additionalCost > 0 && (
-                          <span className="text-sm text-orange-600 font-semibold">+¥{box.additionalCost}</span>
-                        )}
-                      </div>
-                      <div className="space-y-3 max-h-96 overflow-y-auto">
-                        {box.personalizedFoods.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                            <div className="text-4xl">{item.img}</div>
-                            <span className="text-slate-700 font-medium">{item.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* サブスクリプション情報 */}
-              <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-xl p-6 sm:p-8 mb-8">
-                <div className="text-center">
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">💳 年間サブスクリプション</h3>
-                  <p className="text-sm sm:text-base text-slate-300 mb-6 leading-relaxed">
-                    3年周期で新鮮な保存食を<br className="sm:hidden" />お届け
-                    {rec.personCount > 1 ? ` (${rec.personCount}人分)` : ''}
-                  </p>
-                  <div className="bg-orange-500 rounded-2xl p-6 sm:p-8 max-w-md mx-auto">
-                    <div className="text-white">
-                      <div className="text-4xl sm:text-5xl font-bold mb-2">¥{rec.annualCost.toLocaleString()}</div>
-                      <div className="text-lg sm:text-xl mb-4">/年</div>
-                      {rec.personCount > 1 && (
-                        <div className="text-xs sm:text-sm opacity-75 mb-4">
-                          1人あたり ¥5,000/年
-                        </div>
-                      )}
-                      <div className="text-xs sm:text-sm opacity-90 border-t border-white border-opacity-30 pt-4 space-y-2 text-left">
-                        <p>✓ 3年ごとに新しい保存食を<br className="sm:hidden" />お届け</p>
-                        <p>✓ 古い食品の回収サービス付き</p>
-                        <p>✓ 常に新鮮な備蓄をキープ</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-6 sm:p-8 mb-8 border-2 border-orange-200">
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-orange-300 gap-2">
-                    <span className="text-base sm:text-lg font-bold text-slate-800">💰 初期コスト（初回のみ）</span>
-                    <span className="text-2xl sm:text-3xl font-bold text-orange-500">¥{rec.initialCost.toLocaleString()}</span>
-                  </div>
-                  <div className="text-xs sm:text-sm text-slate-600 space-y-1">
-                    <div className="flex justify-between">
-                      <span>基本セット（{rec.personCount}人分）</span>
-                      <span>¥{(9980 * rec.personCount).toLocaleString()}</span>
-                    </div>
-                    {rec.totalAdditionalCost > 0 && (
-                      <div className="flex justify-between text-orange-600 font-semibold">
-                        <span>カスタマイズ追加料金</span>
-                        <span>+¥{rec.totalAdditionalCost.toLocaleString()}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between pt-2 border-t border-orange-200 font-bold text-base">
-                      <span>合計</span>
-                      <span>¥{rec.initialCost.toLocaleString()}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <div>
-                      <span className="text-xl sm:text-2xl font-bold text-slate-800">年間サブスク料金</span>
-                      <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-                        3年ごとに新鮮な保存食を<br className="sm:hidden" />お届け
-                      </p>
-                    </div>
-                    <span className="text-3xl sm:text-4xl font-bold text-orange-500">¥{rec.annualCost.toLocaleString()}</span>
-                  </div>
-                  {rec.personCount > 1 && (
-                    <div className="text-sm text-slate-600 pt-2">
-                      1人分 ¥5,000 × {rec.personCount}人 = ¥{rec.annualCost.toLocaleString()}
-                    </div>
-                  )}
-                </div>
-                <div className="mt-6 bg-white bg-opacity-50 rounded-lg p-4">
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    <strong>📦 サービス内容:</strong><br className="sm:hidden" /> 
-                    3年ごとに新しい保存食をお届けし、<br />
-                    古い食品を回収します。<br />
-                    常に新鮮な備蓄をキープできます。
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {/* 利用規約同意チェックボックス */}
-                <div className="bg-white rounded-xl p-4 border-2 border-slate-200">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={agreedToTerms}
-                      onChange={(e) => setAgreedToTerms(e.target.checked)}
-                      className="mt-1 w-5 h-5 text-orange-500 rounded focus:ring-orange-500"
-                    />
-                    <span className="text-sm text-slate-700">
-                      <button
-                        onClick={() => setShowPolicy(true)}
-                        className="text-orange-500 hover:text-orange-600 underline font-medium"
-                      >
-                        利用規約・プライバシーポリシー
-                      </button>
-                      に同意します
+                    <span className={`text-sm font-semibold ${validation.selectedCount === 6 ? 'text-green-600' : 'text-orange-600'}`}>
+                      選択中: {validation.selectedCount}/6品
                     </span>
-                  </label>
+                  </div>
+                  
+                  {/* バリデーションメッセージ */}
+                  {validation.selectedCount < 6 && (
+                    <p className="text-xs text-slate-600 mt-2">
+                      あと{6 - validation.selectedCount}品選択してください
+                    </p>
+                  )}
+                  {validation.selectedCount === 6 && validation.mainDishCount < 2 && (
+                    <p className="text-xs text-red-600 mt-2 font-semibold">
+                      ⚠️ 主食🍚は2品以上選んでください（現在{validation.mainDishCount}品）
+                    </p>
+                  )}
+                  {validation.isValid && (
+                    <p className="text-xs text-green-600 mt-2 font-semibold">
+                      ✓ 選択完了！ 追加料金: +¥{validation.additionalCost}
+                    </p>
+                  )}
                 </div>
 
-                <button 
-                  onClick={submitToGoogleForm} 
-                  disabled={!agreedToTerms}
-                  className={`w-full px-8 py-5 text-white text-xl font-bold rounded-xl transition-all shadow-lg inline-flex items-center justify-center gap-3 ${
-                    agreedToTerms 
-                      ? 'bg-orange-500 hover:bg-orange-600 transform hover:scale-105 cursor-pointer' 
-                      : 'bg-slate-300 cursor-not-allowed'
-                  }`}
-                >
-                  <Mail className="w-6 h-6" />このプランで申し込む
-                </button>
-                {copied && (
-                  <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
-                    <p className="text-green-800 font-medium">✓ 送信しました！</p>
-                    <p className="text-sm text-green-700 mt-1">お申し込みを受け付けました。ご登録いただいたメールアドレスに確認のご連絡をさせていただきます。</p>
-                  </div>
-                )}
-                <button onClick={() => handleStepChange(1)} className="w-full px-8 py-4 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-all">最初に戻る</button>
+                {/* 10品グリッド表示 */}
+                <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+                  {box.recommendedItems.map((item, i) => {
+                    const selected = isSelected(item.name);
+                    const isMainDish = item.category === '主食';
+                    
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => toggleSelection(boxIndex, item.name)}
+                        disabled={!selected && validation.selectedCount >= 6}
+                        className={`
+                          relative p-3 rounded-lg border-2 transition-all text-left
+                          ${selected 
+                            ? 'bg-orange-500 border-orange-600 text-white shadow-md scale-105' 
+                            : 'bg-slate-50 border-slate-200 hover:border-orange-300 hover:shadow-sm'
+                          }
+                          ${!selected && validation.selectedCount >= 6 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                        `}
+                      >
+                        {/* 選択チェックマーク */}
+                        {selected && (
+                          <div className="absolute top-1 right-1 bg-white rounded-full p-0.5">
+                            <CheckCircle2 className="w-4 h-4 text-orange-500" />
+                          </div>
+                        )}
+                        
+                        {/* 主食バッジ */}
+                        {isMainDish && (
+                          <div className="absolute top-1 left-1 bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded">
+                            🍚主食
+                          </div>
+                        )}
+                        
+                        <div className="flex flex-col gap-1 mt-6">
+  <div className="text-2xl">{item.img}</div>
+  <span className={`text-xs font-medium leading-tight ${selected ? 'text-white' : 'text-slate-700'}`}>
+    {item.name}
+  </span>
+</div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
-        )}
+        );
+      })}
+
+      {/* サブスクリプション情報 */}
+      <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-xl p-6 sm:p-8 mb-8">
+        <div className="text-center">
+          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">💳 年間サブスクリプション</h3>
+          <p className="text-sm sm:text-base text-slate-300 mb-6 leading-relaxed">
+            3年周期で新鮮な保存食を<br className="sm:hidden" />お届け
+            {rec.personCount > 1 ? ` (${rec.personCount}人分)` : ''}
+          </p>
+          <div className="bg-orange-500 rounded-2xl p-6 sm:p-8 max-w-md mx-auto">
+            <div className="text-white">
+              <div className="text-4xl sm:text-5xl font-bold mb-2">¥{rec.annualCost.toLocaleString()}</div>
+              <div className="text-lg sm:text-xl mb-4">/年</div>
+              {rec.personCount > 1 && (
+                <div className="text-xs sm:text-sm opacity-75 mb-4">
+                  1人あたり ¥6,000/年
+                </div>
+              )}
+              <div className="text-xs sm:text-sm opacity-90 border-t border-white border-opacity-30 pt-4 space-y-2 text-left">
+                <p>✓ 3年ごとに新しい保存食を<br className="sm:hidden" />お届け</p>
+                <p>✓ 古い食品の回収サービス付き</p>
+                <p>✓ 常に新鮮な備蓄をキープ</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* 価格サマリー */}
+     <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-6 sm:p-8 mb-8 border-2 border-orange-200">
+  <div className="space-y-4">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-orange-300 gap-2">
+      <span className="text-base sm:text-lg font-bold text-slate-800">💰 初期コスト（初回のみ）</span>
+      <span className="text-2xl sm:text-3xl font-bold text-orange-500">
+        ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)).toLocaleString()}
+      </span>
+    </div>
+    <div className="text-xs sm:text-sm text-slate-600 space-y-1">
+      <div className="flex justify-between">
+        <span>基本セット（{rec.personCount}人分）</span>
+        <span>¥{(9980 * rec.personCount).toLocaleString()}</span>
+      </div>
+      {rec.boxes.map((box, idx) => {
+        const validation = validateSelection(idx);
+        if (validation.additionalCost > 0) {
+          return (
+            <div key={idx} className="flex justify-between text-orange-600 font-semibold">
+              <span>{box.personLabel || '本人'}の追加料金</span>
+              <span>+¥{validation.additionalCost.toLocaleString()}</span>
+            </div>
+          );
+        }
+        return null;
+      })}
+      <div className="flex justify-between pt-2 border-t border-orange-200 font-bold text-base">
+        <span>小計（初期費用）</span>
+        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)).toLocaleString()}</span>
+      </div>
+      <div className="flex justify-between text-slate-700">
+        <span>年間サブスク（{rec.personCount}人分）</span>
+        <span>¥{rec.annualCost.toLocaleString()}</span>
+      </div>
+      <div className="flex justify-between pt-2 border-t-2 border-orange-300 font-bold text-lg text-orange-600">
+        <span>合計（初年度）</span>
+        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0) + rec.annualCost).toLocaleString()}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+      {/* 申し込みボタン */}
+      <div className="space-y-4">
+        {/* 利用規約同意チェックボックス */}
+        <div className="bg-white rounded-xl p-4 border-2 border-slate-200">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              className="mt-1 w-5 h-5 text-orange-500 rounded focus:ring-orange-500"
+            />
+            <span className="text-sm text-slate-700">
+              <button
+                onClick={() => setShowPolicy(true)}
+                className="text-orange-500 hover:text-orange-600 underline font-medium"
+              >
+                利用規約・プライバシーポリシー
+              </button>
+              に同意します
+            </span>
+          </label>
+        </div>
+
+        {/* 全員選択完了チェック */}
+        {rec.boxes.some((box, idx) => !validateSelection(idx).isValid) && (
+          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 text-center">
+            <p className="text-yellow-800 font-medium">⚠️ すべての人の食品を選択してください</p>
+            <div className="text-sm text-yellow-700 mt-2 space-y-1">
+              {rec.boxes.map((box, idx) => {
+                const validation = validateSelection(idx);
+                if (!validation.isValid) {
+                  return (
+                    <p key={idx}>
+                      {box.personLabel || '本人'}: 
+                      {validation.selectedCount < 6 && ` あと${6 - validation.selectedCount}品選択`}
+                      {validation.selectedCount === 6 && validation.mainDishCount < 2 && ' 主食を2品以上選択'}
+                    </p>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </div>
+        )}
+
+       {/* 支払い方法選択ボタン */}
+<div className="space-y-4">
+  <p className="text-center text-lg font-bold text-slate-800 mb-4">
+    💳 お支払い方法を選択してください
+  </p>
+  
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {/* クレジットカード */}
+    <button
+      onClick={() => {
+        setPaymentMethod('card');
+        submitToGoogleForm();
+      }}
+      disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
+      className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
+        agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
+          ? 'bg-orange-500 hover:bg-orange-600 transform hover:scale-105 cursor-pointer'
+          : 'bg-slate-300 cursor-not-allowed'
+      }`}
+    >
+      <CreditCard className="w-8 h-8" />
+      <span>クレジットカード決済</span>
+      <span className="text-sm font-normal opacity-90">即時決済・すぐに発送手配</span>
+    </button>
+
+    {/* 銀行振込 */}
+    <button
+  onClick={async () => {
+    setPaymentMethod('bank');
+    // 少し待ってから送信
+    await new Promise(resolve => setTimeout(resolve, 100));
+    submitToGoogleForm();
+  }}
+      disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
+      className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
+        agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
+          ? 'bg-blue-500 hover:bg-blue-600 transform hover:scale-105 cursor-pointer'
+          : 'bg-slate-300 cursor-not-allowed'
+      }`}
+    >
+      <Mail className="w-8 h-8" />
+      <span>銀行振込で申し込む</span>
+      <span className="text-sm font-normal opacity-90">振込先をメールでご案内</span>
+    </button>
+  </div>
+</div>
+        
+        {copied && (
+          <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
+            <p className="text-green-800 font-medium">✓ 送信しました！</p>
+            <p className="text-sm text-green-700 mt-1">お申し込みを受け付けました。ご登録いただいたメールアドレスに確認のご連絡をさせていただきます。</p>
+          </div>
+        )}
+        
+        <button onClick={() => handleStepChange(1)} className="w-full px-8 py-4 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-all">
+          最初に戻る
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {/* フッター */}
       <footer className="bg-slate-800 text-white py-8 mt-12">
@@ -984,7 +1410,7 @@ const ShukiApp = () => {
         onSuccess={handleAuthSuccess} 
       />
     </div>
-  );
+    </div>
+);
 };
-
 export default ShukiApp;
