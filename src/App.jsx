@@ -705,48 +705,156 @@ if (showMyPage) {
       <div className={`transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
         
         {step === 1 && (
-          <>
-          {/* ヘッダー */}
-          {user && (
-            <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
-              <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <UserCircle className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm text-slate-600">{user.email}</span>
-                </div>
-                <button
-                  onClick={() => setShowMyPage(true)}
-                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all text-sm"
-                >
-                  マイページ
-                </button>
-              </div>
-            </div>
-          )}
-          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
-            <div className="max-w-2xl w-full text-center space-y-6 sm:space-y-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-slate-800 rounded-full mb-4">
-                <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-orange-500" />
-              </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800">
-                護己 <span className="text-xl sm:text-2xl md:text-3xl text-slate-600">-Shuki-</span>
-              </h1>
-              <p className="text-lg sm:text-xl md:text-2xl text-orange-500 font-medium px-4 leading-relaxed">
-                日常に溶け込む、<br className="sm:hidden" />
-                あなただけの防災。
-              </p>
-              <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto px-4 leading-relaxed">
-                たった1分の質問に答えるだけで、<br />
-                AIがあなたの生活スタイルと<br className="sm:hidden" />防災ニーズに<br className="hidden sm:inline" />
-                最適な備蓄を提案します。
-              </p>
-              <button onClick={() => handleStepChange(2)} className="mt-8 sm:mt-12 px-8 sm:px-12 py-4 sm:py-5 bg-orange-500 text-white text-lg sm:text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-lg inline-flex items-center gap-3 min-h-[56px]">
-                総合診断を始める<ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-            </div>
+  <>
+    {/* ヘッダー */}
+    {user && (
+      <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <UserCircle className="w-5 h-5 text-slate-600" />
+            <span className="text-sm text-slate-600">{user.email}</span>
           </div>
-          </>
-        )}
+          <button
+            onClick={() => setShowMyPage(true)}
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all text-sm"
+          >
+            マイページ
+          </button>
+        </div>
+      </div>
+    )}
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <div className="max-w-2xl w-full text-center space-y-6 sm:space-y-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-slate-800 rounded-full mb-4">
+          <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-orange-500" />
+        </div>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800">
+          護己 <span className="text-xl sm:text-2xl md:text-3xl text-slate-600">-Shuki-</span>
+        </h1>
+        <p className="text-lg sm:text-xl md:text-2xl text-orange-500 font-medium px-4 leading-relaxed">
+          日常に溶け込む、<br className="sm:hidden" />
+          あなただけの防災。
+        </p>
+        <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto px-4 leading-relaxed">
+          たった1分の質問に答えるだけで、<br />
+          AIがあなたの生活スタイルと<br className="sm:hidden" />防災ニーズに<br className="hidden sm:inline" />
+          最適な備蓄を提案します。
+        </p>
+        <button onClick={() => handleStepChange(2)} className="mt-8 sm:mt-12 px-8 sm:px-12 py-4 sm:py-5 bg-orange-500 text-white text-lg sm:text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-lg inline-flex items-center gap-3 min-h-[56px]">
+          総合診断を始める<ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+      </div>
+    </div>
+
+    {/* サービス説明セクション - Stripe審査用 */}
+    <div className="max-w-4xl mx-auto px-4 pb-16">
+      {/* サービス概要 */}
+      <section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          護己-Shuki- とは？
+        </h2>
+        <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
+          護己-Shuki-は、あなたの生活環境や家族構成に合わせた
+          <strong>防災備蓄食品をお届けするサブスクリプションサービス</strong>です。
+          面倒な賞味期限管理もお任せください。
+        </p>
+        
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="text-center p-4">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📋</span>
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">1. 診断</h3>
+            <p className="text-sm text-gray-600">家族構成やアレルギーなど簡単な質問に回答</p>
+          </div>
+          <div className="text-center p-4">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">🎯</span>
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">2. 提案</h3>
+            <p className="text-sm text-gray-600">AIがあなたに最適な備蓄プランを提案</p>
+          </div>
+          <div className="text-center p-4">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📦</span>
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">3. お届け</h3>
+            <p className="text-sm text-gray-600">3年に一度ご自宅に防災食品をお届け</p>
+          </div>
+        </div>
+      </section>
+
+     {/* 料金プラン */}
+<section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+    料金プラン
+  </h2>
+  <div className="max-w-2xl mx-auto">
+    <div className="grid md:grid-cols-2 gap-6">
+      {/* 初期費用 */}
+      <div className="border-2 border-orange-400 rounded-xl p-6 text-center">
+        <p className="text-gray-600 mb-2">初期費用（商品代）</p>
+        <p className="text-4xl font-bold text-orange-500 mb-2">
+          ¥9,980<span className="text-lg font-normal text-gray-500">〜</span>
+        </p>
+        <p className="text-sm text-gray-500 mb-4">（税込・送料込み）</p>
+        <ul className="text-left text-sm text-gray-600 space-y-2">
+          <li>✓ 3年分の防災備蓄食品セット</li>
+          <li>✓ 家族人数に応じたカスタマイズ</li>
+          <li>✓ アレルギー対応可能</li>
+        </ul>
+      </div>
+      {/* 年会費 */}
+      <div className="border-2 border-slate-300 rounded-xl p-6 text-center">
+        <p className="text-gray-600 mb-2">年会費</p>
+        <p className="text-4xl font-bold text-slate-700 mb-2">
+          ¥6,000<span className="text-lg font-normal text-gray-500">/年</span>
+        </p>
+        <p className="text-sm text-gray-500 mb-4">（税込）</p>
+        <ul className="text-left text-sm text-gray-600 space-y-2">
+          <li>✓ 賞味期限管理サービス</li>
+          <li>✓ 期限前の自動お知らせ</li>
+          <li>✓ 入れ替え時期のご案内</li>
+        </ul>
+      </div>
+    </div>
+    <p className="text-xs text-gray-500 mt-6 text-center">
+      ※ご家族の人数や選択オプションにより初期費用が変動します<br />
+      ※商品は3年周期でお届け（今後2年・1年周期も導入予定）
+    </p>
+  </div>
+</section>
+
+      {/* 届く商品例 */}
+      <section className="bg-white rounded-2xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          お届けする商品例
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <span className="text-3xl mb-2 block">🍚</span>
+            <p className="text-sm font-medium">アルファ米</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <span className="text-3xl mb-2 block">🥫</span>
+            <p className="text-sm font-medium">缶詰・レトルト</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <span className="text-3xl mb-2 block">💧</span>
+            <p className="text-sm font-medium">長期保存水</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <span className="text-3xl mb-2 block">🍪</span>
+            <p className="text-sm font-medium">栄養補助食品</p>
+          </div>
+        </div>
+        <p className="text-sm text-gray-500 mt-6 text-center">
+          ※診断結果に基づき、最適な商品を組み合わせてお届けします
+        </p>
+      </section>
+    </div>
+  </>
+)}
 
         {step === 2 && (
           <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12">
