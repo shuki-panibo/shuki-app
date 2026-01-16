@@ -4,8 +4,7 @@ import { auth } from './firebase';
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
-  sendPasswordResetEmail,
-  sendEmailVerification 
+  sendPasswordResetEmail
 } from 'firebase/auth';
 
 const AuthModal = ({ isOpen, onClose, onSuccess }) => {
@@ -16,7 +15,6 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
-  const [verificationSent, setVerificationSent] = useState(false);
   
   // バリデーション状態
   const [emailError, setEmailError] = useState('');
@@ -50,7 +48,6 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
 
   // エラーメッセージの曖昧化
   const getGenericErrorMessage = (errorCode) => {
-    // すべてのエラーを曖昧なメッセージに統一
     switch (errorCode) {
       case 'auth/user-not-found':
       case 'auth/wrong-password':
@@ -58,7 +55,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
       case 'auth/invalid-email':
         return 'メールアドレスまたはパスワードが正しくありません';
       case 'auth/email-already-in-use':
-        return 'このメールアドレスは既に使用されています';
+        return 'このメールアドレスは既に登録されています。ログインしてください。';
       case 'auth/too-many-requests':
         return 'しばらく時間をおいてから再度お試しください';
       case 'auth/network-request-failed':
@@ -87,14 +84,12 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      // メール確認を送信
-      await sendEmailVerification(userCredential.user);
-      setVerificationSent(true);
-      
-      // 確認メール送信後、一旦ログアウトさせる
-      await auth.signOut();
+      // 新規登録成功 → すぐに診断結果画面へ
+      onSuccess(userCredential.user);
+      onClose();
       
     } catch (err) {
+      console.error('Signup error:', err.code);
       setError(getGenericErrorMessage(err.code));
     } finally {
       setLoading(false);
@@ -116,18 +111,10 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // メール確認済みかチェック
-      if (!userCredential.user.emailVerified) {
-        await auth.signOut();
-        setError('メールアドレスが未確認です。受信トレイをご確認ください。');
-        setLoading(false);
-        return;
-      }
-      
       onSuccess(userCredential.user);
       onClose();
     } catch (err) {
+      console.error('Login error:', err.code);
       setError(getGenericErrorMessage(err.code));
     } finally {
       setLoading(false);
@@ -151,8 +138,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
       await sendPasswordResetEmail(auth, email);
       setResetSent(true);
     } catch (err) {
-      // パスワードリセットも曖昧なメッセージに
-      setError('入力されたメールアドレスにリセットメールを送信しました。');
+      // パスワードリセットも曖昧なメッセージに（セキュリティ上）
       setResetSent(true);
     } finally {
       setLoading(false);
@@ -179,6 +165,15 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
     } else {
       setPasswordError('');
     }
+  };
+
+  // モード切り替え時にエラーをリセット
+  const switchMode = (newMode) => {
+    setMode(newMode);
+    setError('');
+    setEmailError('');
+    setPasswordError('');
+    setResetSent(false);
   };
 
   if (!isOpen) return null;
@@ -210,18 +205,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
         )}
 
-        {verificationSent && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-600 text-sm flex items-start">
-            <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold mb-1">会員登録ありがとうございます！</p>
-              <p>確認メールを送信しました。メール内のリンクをクリックして、メールアドレスを確認してください。</p>
-              <p className="mt-2 text-xs">※メールが届かない場合は、迷惑メールフォルダもご確認ください。</p>
-            </div>
-          </div>
-        )}
-
-        {mode === 'signup' && !verificationSent && (
+        {mode === 'signup' && (
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -284,12 +268,12 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
               disabled={loading || emailError || passwordError}
               className="w-full py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all disabled:bg-slate-300 disabled:cursor-not-allowed"
             >
-              {loading ? '登録中...' : '会員登録'}
+              {loading ? '登録中...' : '会員登録して診断結果を見る'}
             </button>
 
             <p className="text-center text-sm text-slate-600">
               すでにアカウントをお持ちですか？{' '}
-              <button type="button" onClick={() => setMode('login')} className="text-orange-500 font-semibold">
+              <button type="button" onClick={() => switchMode('login')} className="text-orange-500 font-semibold">
                 ログイン
               </button>
             </p>
@@ -340,10 +324,10 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
             </button>
 
             <div className="flex justify-between text-sm">
-              <button type="button" onClick={() => setMode('signup')} className="text-orange-500 font-semibold">
+              <button type="button" onClick={() => switchMode('signup')} className="text-orange-500 font-semibold">
                 新規登録
               </button>
-              <button type="button" onClick={() => setMode('reset')} className="text-slate-600 hover:text-slate-800">
+              <button type="button" onClick={() => switchMode('reset')} className="text-slate-600 hover:text-slate-800">
                 パスワードを忘れた方
               </button>
             </div>
@@ -380,7 +364,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
             </button>
 
             <p className="text-center text-sm text-slate-600">
-              <button type="button" onClick={() => setMode('login')} className="text-orange-500 font-semibold">
+              <button type="button" onClick={() => switchMode('login')} className="text-orange-500 font-semibold">
                 ログインに戻る
               </button>
             </p>
