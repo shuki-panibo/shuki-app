@@ -335,12 +335,13 @@ const ShukiApp = () => {
       }));
       
       boxes.push({
-        personIndex: i,
-        personLabel: personCount === 1 ? '' : `${i + 1}人目`,
-        baseItems,
-        recommendedItems, // ★10品の推奨商品
-        personalizations
-      });
+  personIndex: i,
+  personLabel: personCount === 1 ? '' : `${i + 1}人目`,
+  baseItems,
+  recommendedItems,
+  personalizations,
+  additionalCost: 0  // デフォルト値を追加
+});
     }
     
     // 全体の合計
@@ -533,22 +534,26 @@ const ShukiApp = () => {
   
   // 診断結果をFirestoreに保存
   const saveDiagnosisToFirestore = async (user, result) => {
-    try {
-      await addDoc(collection(db, 'diagnoses'), {
-        userId: user.uid,
-        userEmail: user.email,
-        userName: formData.name,
-        timestamp: new Date(),
-        formData: formData,
-        result: result,
-        status: 'pending',
-        initialCost: result.initialCost,
-        annualCost: result.annualCost
-      });
-    } catch (error) {
-      console.error('診断結果の保存に失敗しました:', error);
-    }
-  };
+  try {
+    // 正しい初期費用を計算
+    const totalAdditionalCost = result.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0);
+    const correctInitialCost = 9980 * result.personCount + totalAdditionalCost;
+    
+    await addDoc(collection(db, 'diagnoses'), {
+      userId: user.uid,
+      userEmail: user.email,
+      userName: formData.name,
+      timestamp: new Date(),
+      formData: formData,
+      result: result,
+      status: 'pending',
+      initialCost: correctInitialCost,
+      annualCost: result.annualCost
+    });
+  } catch (error) {
+    console.error('診断結果の保存に失敗しました:', error);
+  }
+};
   
   // ユーザーの診断履歴を取得
   const loadUserDiagnoses = async (userId) => {
@@ -649,7 +654,11 @@ const ShukiApp = () => {
     formDataToSubmit.append('disasterType', rec.disasterType.type);
     formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
     formDataToSubmit.append('currentPreparation', formData.currentPreparation);
-    formDataToSubmit.append('initialCost', rec.initialCost.toString());
+    // 正しい初期費用を計算
+const totalAdditionalCost = rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0);
+const correctInitialCost = 9980 * rec.personCount + totalAdditionalCost;
+
+formDataToSubmit.append('initialCost', correctInitialCost.toString());
 formDataToSubmit.append('annualCost', rec.annualCost.toString());
     formDataToSubmit.append('exchangeDate', exchangeDateStr);
     formDataToSubmit.append('personDetails', personDetails);
