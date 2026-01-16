@@ -11,7 +11,7 @@ const ShukiApp = () => {
   const [step, setStep] = useState(1);
   const [fadeIn, setFadeIn] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [showPolicy, setShowPolicy] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(null); // false → null に変更
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [personCount, setPersonCount] = useState(0);
   const [user, setUser] = useState(null);
@@ -677,8 +677,8 @@ formDataToSubmit.append('annualCost', rec.annualCost.toString());
 };
   const rec = diagnosisResult || (step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 });
 
- if (showPolicy) {
-  return <PolicyPage onBack={() => setShowPolicy(false)} />;
+if (showPolicy) {
+  return <PolicyPage onBack={() => setShowPolicy(null)} defaultTab={showPolicy} />;
 }
 
 if (showMyPage) {
@@ -1378,12 +1378,12 @@ if (showMyPage) {
               className="mt-1 w-5 h-5 text-orange-500 rounded focus:ring-orange-500"
             />
             <span className="text-sm text-slate-700">
-              <button
-                onClick={() => setShowPolicy(true)}
-                className="text-orange-500 hover:text-orange-600 underline font-medium"
-              >
-                利用規約・プライバシーポリシー
-              </button>
+             <button
+  onClick={() => setShowPolicy('terms')}
+  className="text-orange-500 hover:text-orange-600 underline font-medium"
+>
+  利用規約・プライバシーポリシー
+</button>
               に同意します
             </span>
           </label>
@@ -1489,15 +1489,30 @@ if (showMyPage) {
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-3">各種ポリシー</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <button onClick={() => setShowPolicy(true)} className="text-slate-300 hover:text-orange-400 transition-colors">
-                    利用規約・プライバシーポリシー
-                  </button>
-                </li>
-              </ul>
-            </div>
+  <h4 className="font-semibold mb-3">各種ポリシー</h4>
+  <ul className="space-y-2 text-sm">
+    <li>
+      <button onClick={() => setShowPolicy('terms')} className="text-slate-300 hover:text-orange-400 transition-colors">
+        利用規約
+      </button>
+    </li>
+    <li>
+      <button onClick={() => setShowPolicy('privacy')} className="text-slate-300 hover:text-orange-400 transition-colors">
+        プライバシーポリシー
+      </button>
+    </li>
+    <li>
+      <button onClick={() => setShowPolicy('cancellation')} className="text-slate-300 hover:text-orange-400 transition-colors">
+        キャンセルポリシー
+      </button>
+    </li>
+    <li>
+      <button onClick={() => setShowPolicy('tokushoho')} className="text-slate-300 hover:text-orange-400 transition-colors">
+        特定商取引法に基づく表記
+      </button>
+    </li>
+  </ul>
+</div>
             <div>
               <h4 className="font-semibold mb-3">お問い合わせ</h4>
               <ul className="space-y-2 text-sm text-slate-300">

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowLeft, FileText, Shield, RefreshCw, Scale } from 'lucide-react';
 
-const PolicyPage = ({ onBack }) => {
-  const [activePolicy, setActivePolicy] = useState('terms');
+const PolicyPage = ({ onBack, defaultTab = 'terms' }) => {
+  const [activePolicy, setActivePolicy] = useState(defaultTab);
 
   const policies = {
     terms: {
