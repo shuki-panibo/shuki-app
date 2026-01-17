@@ -532,12 +532,13 @@ const ShukiApp = () => {
     return () => unsubscribe();
   }, []);
   
-  // 診断結果をFirestoreに保存
-  const saveDiagnosisToFirestore = async (user, result) => {
+ // 診断結果をFirestoreに保存
+const saveDiagnosisToFirestore = async (user, result) => {
   try {
-    // 正しい初期費用を計算
-    const totalAdditionalCost = result.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0);
-    const correctInitialCost = 9980 * result.personCount + totalAdditionalCost;
+    // ★修正: result.boxesから直接計算（userSelectionsに依存しない）
+    // 注意: この時点ではuserSelectionsがまだ空なので、
+    // 初期状態での保存は基本料金のみとする
+    const baseInitialCost = 9980 * result.personCount;
     
     await addDoc(collection(db, 'diagnoses'), {
       userId: user.uid,
@@ -547,7 +548,7 @@ const ShukiApp = () => {
       formData: formData,
       result: result,
       status: 'pending',
-      initialCost: correctInitialCost,
+      initialCost: baseInitialCost, // 基本料金のみ（選択前）
       annualCost: result.annualCost
     });
   } catch (error) {
@@ -607,11 +608,14 @@ const ShukiApp = () => {
   }, [step]);
 
 
- const submitToGoogleForm = async () => {
+// ★修正: paymentMethodを引数で受け取る
+const submitToGoogleForm = async (selectedPaymentMethod) => {
   try {
     console.log('🚀 申し込み処理開始');
+    console.log('💳 支払い方法:', selectedPaymentMethod);
+    
     const rec = generateRecommendations();
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwTecuqsmXSRAyREVlfUE3V-V8DzX6RLgPh4FpTGdbnzukJ1oTkeMlc-39gxgPq0JNM/exec'
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwTecuqsmXSRAyREVlfUE3V-V8DzX6RLgPh4FpTGdbnzukJ1oTkeMlc-39gxgPq0JNM/exec';
     
     const exchangeDate = new Date();
     exchangeDate.setFullYear(exchangeDate.getFullYear() + 3);
@@ -630,22 +634,27 @@ const ShukiApp = () => {
       return `[${box.personLabel || '本人'}]${box.recommendedItems.map(item => item.name).join('、')}`;
     }).join(' | ');
     
-    // ★ここで住所を整形（関数の中で定義）
     const shippingAddressText = `〒${formData.shippingAddress.postalCode} ${formData.shippingAddress.prefecture}${formData.shippingAddress.city}${formData.shippingAddress.address}${formData.shippingAddress.building ? ' ' + formData.shippingAddress.building : ''}`;
     
+    // ★修正: additionalCostsの計算
     const additionalCosts = rec.boxes.map((box, idx) => {
-  const validation = validateSelection(idx);
-  return validation.additionalCost;
-});
+      const validation = validateSelection(idx);
+      return validation.additionalCost;
+    });
+    
+    // ★修正: 正しい初期費用を計算
+    const totalAdditionalCost = additionalCosts.reduce((sum, cost) => sum + cost, 0);
+    const correctInitialCost = 9980 * rec.personCount + totalAdditionalCost;
 
     console.log('📦 データ準備完了:', {
-  name: formData.name,
-  email: formData.email,
-  shippingAddress: shippingAddressText,
-  initialCost: rec.initialCost,
-  annualCost: rec.annualCost,
-  additionalCosts: additionalCosts
-});
+      name: formData.name,
+      email: formData.email,
+      shippingAddress: shippingAddressText,
+      initialCost: correctInitialCost,
+      annualCost: rec.annualCost,
+      additionalCosts: additionalCosts,
+      paymentMethod: selectedPaymentMethod
+    });
 
     const formDataToSubmit = new FormData();
     formDataToSubmit.append('name', formData.name);
@@ -654,12 +663,8 @@ const ShukiApp = () => {
     formDataToSubmit.append('disasterType', rec.disasterType.type);
     formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
     formDataToSubmit.append('currentPreparation', formData.currentPreparation);
-    // 正しい初期費用を計算
-const totalAdditionalCost = rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0);
-const correctInitialCost = 9980 * rec.personCount + totalAdditionalCost;
-
-formDataToSubmit.append('initialCost', correctInitialCost.toString());
-formDataToSubmit.append('annualCost', rec.annualCost.toString());
+    formDataToSubmit.append('initialCost', correctInitialCost.toString());
+    formDataToSubmit.append('annualCost', rec.annualCost.toString());
     formDataToSubmit.append('exchangeDate', exchangeDateStr);
     formDataToSubmit.append('personDetails', personDetails);
     formDataToSubmit.append('baseItems', baseItems);
@@ -671,14 +676,17 @@ formDataToSubmit.append('annualCost', rec.annualCost.toString());
     formDataToSubmit.append('address', formData.shippingAddress.address);
     formDataToSubmit.append('building', formData.shippingAddress.building || '');
     formDataToSubmit.append('additionalCosts', JSON.stringify(additionalCosts));
-    formDataToSubmit.append('paymentMethod', paymentMethod);
+    formDataToSubmit.append('paymentMethod', selectedPaymentMethod); // ★引数を使用
     
     console.log('📡 Google Apps Scriptにリクエスト送信中...');
     
-    await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
+    const response = await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
+    const result = await response.text();
     
-    console.log('✅ 送信完了');
-    alert('お申し込みありがとうございます！\n担当者より3営業日以内にご連絡いたします。');
+    console.log('✅ 送信完了:', result);
+    alert('お申し込みありがとうございます！\n確認メールをお送りしましたのでご確認ください。');
+    setCopied(true);
+    
   } catch (error) {
     console.error('❌ Error!', error.message);
     alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
@@ -1427,43 +1435,35 @@ if (showMyPage) {
   </p>
   
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {/* クレジットカード */}
-    <button
-      onClick={() => {
-        setPaymentMethod('card');
-        submitToGoogleForm();
-      }}
-      disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
-      className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
-        agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
-          ? 'bg-orange-500 hover:bg-orange-600 transform hover:scale-105 cursor-pointer'
-          : 'bg-slate-300 cursor-not-allowed'
-      }`}
-    >
-      <CreditCard className="w-8 h-8" />
-      <span>クレジットカード決済</span>
-      <span className="text-sm font-normal opacity-90">即時決済・すぐに発送手配</span>
-    </button>
+   {/* クレジットカード */}
+<button
+  onClick={() => submitToGoogleForm('card')}
+  disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
+  className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
+    agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
+      ? 'bg-orange-500 hover:bg-orange-600 transform hover:scale-105 cursor-pointer'
+      : 'bg-slate-300 cursor-not-allowed'
+  }`}
+>
+  <CreditCard className="w-8 h-8" />
+  <span>クレジットカード決済</span>
+  <span className="text-sm font-normal opacity-90">即時決済・すぐに発送手配</span>
+</button>
 
-    {/* 銀行振込 */}
-    <button
-  onClick={async () => {
-    setPaymentMethod('bank');
-    // 少し待ってから送信
-    await new Promise(resolve => setTimeout(resolve, 100));
-    submitToGoogleForm();
-  }}
-      disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
-      className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
-        agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
-          ? 'bg-blue-500 hover:bg-blue-600 transform hover:scale-105 cursor-pointer'
-          : 'bg-slate-300 cursor-not-allowed'
-      }`}
-    >
-      <Mail className="w-8 h-8" />
-      <span>銀行振込で申し込む</span>
-      <span className="text-sm font-normal opacity-90">振込先をメールでご案内</span>
-    </button>
+{/* 銀行振込 */}
+<button
+  onClick={() => submitToGoogleForm('bank')}
+  disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
+  className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
+    agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
+      ? 'bg-blue-500 hover:bg-blue-600 transform hover:scale-105 cursor-pointer'
+      : 'bg-slate-300 cursor-not-allowed'
+  }`}
+>
+  <Mail className="w-8 h-8" />
+  <span>銀行振込で申し込む</span>
+  <span className="text-sm font-normal opacity-90">振込先をメールでご案内</span>
+</button>
   </div>
 </div>
         
