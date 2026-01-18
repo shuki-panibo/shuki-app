@@ -315,7 +315,9 @@ const ShukiApp = () => {
       const baseItems = [
         { name: '保存水 500ml (2本)', img: '💧' },
         { name: '防災用品 (アルミブランケット、マスク、軍手、ホイッスル、除菌シート)', img: '🎒' },
-        { name: '簡易トイレ (10個)', img: '🚽' }
+        { name: '簡易トイレ (10個)', img: '🚽' },
+         { name: 'LEDライト', img: '🔦' },
+  { name: '圧縮靴下', img: '🧦' }
       ];
       
       if (formData.livingEnvironment === 'mansion') {
@@ -630,9 +632,11 @@ const submitToGoogleForm = async (selectedPaymentMethod) => {
       return `[${box.personLabel || '本人'}]${box.baseItems.map(item => item.name).join('、')}`;
     }).join(' | ');
     
-    const recommendedFoods = rec.boxes.map((box, idx) => {
-      return `[${box.personLabel || '本人'}]${box.recommendedItems.map(item => item.name).join('、')}`;
-    }).join(' | ');
+     // 修正後（顧客が選んだ6品目）
+const selectedFoods = rec.boxes.map((box, idx) => {
+  const selections = userSelections[idx] || [];
+  return `[${box.personLabel || '本人'}]${selections.join('、')}`;
+}).join(' | ');
     
     const shippingAddressText = `〒${formData.shippingAddress.postalCode} ${formData.shippingAddress.prefecture}${formData.shippingAddress.city}${formData.shippingAddress.address}${formData.shippingAddress.building ? ' ' + formData.shippingAddress.building : ''}`;
     
@@ -668,7 +672,7 @@ const submitToGoogleForm = async (selectedPaymentMethod) => {
     formDataToSubmit.append('exchangeDate', exchangeDateStr);
     formDataToSubmit.append('personDetails', personDetails);
     formDataToSubmit.append('baseItems', baseItems);
-    formDataToSubmit.append('recommendedFoods', recommendedFoods);
+   formDataToSubmit.append('selectedFoods', selectedFoods);
     formDataToSubmit.append('shippingAddress', shippingAddressText);
     formDataToSubmit.append('postalCode', formData.shippingAddress.postalCode);
     formDataToSubmit.append('prefecture', formData.shippingAddress.prefecture);
@@ -1245,6 +1249,9 @@ if (showMyPage) {
                       選択中: {validation.selectedCount}/6品
                     </span>
                   </div>
+                   <p className="text-xs text-orange-600 bg-orange-50 rounded-lg p-2 mt-2">
+    ※選択する食品により追加料金（+¥710〜¥2,510）が発生する場合があります
+  </p>
                   
                   {/* バリデーションメッセージ */}
                   {validation.selectedCount < 6 && (
