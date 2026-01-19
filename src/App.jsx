@@ -238,12 +238,12 @@ const ShukiApp = () => {
       };
       
       // 好みに応じた商品グループ
-      const tasteGroups = {
-        'しょっぱいもの好き': ['牛丼の具', 'ポークカレー', 'しょうゆラーメン味', 'さばの味噌煮', 'ハンバーグ煮込み'],
-        'あっさり・和食系': ['白粥', '梅粥', '鮭粥', 'うどん味', 'いわしの煮付', '筑前煮', '豚汁', 'けんちん汁'],
-        '辛いもの好き': ['ポークカレー', 'しょうゆラーメン味', 'ハンバーグ煮込みトマトソース', '鶏と野菜のトマト煮'],
-        '甘いもの好き': ['さつま芋のレモン煮', 'スティックバウムクーヘン（プレーン）', 'スティックバウムクーヘン（ココア）', 'ソフト金時豆']
-      };
+     const tasteGroups = {
+  '味濃いめが好き': ['牛丼の具', 'ポークカレー', 'しょうゆラーメン味', 'さばの味噌煮', 'ハンバーグ煮込み'],
+  'あっさりが好き': ['白粥', '梅粥', '鮭粥', 'うどん味', 'いわしの煮付', '筑前煮', '豚汁', 'けんちん汁'],
+  '辛いもの好き': ['ポークカレー', 'しょうゆラーメン味', 'ハンバーグ煮込みトマトソース', '鶏と野菜のトマト煮'],
+  '甘いもの好き': ['さつま芋のレモン煮', 'スティックバウムクーヘン（プレーン）', 'スティックバウムクーヘン（ココア）', 'ソフト金時豆']
+};
       
      // ★10品推奨ロジック（修正版）
       let recommendedFoods = [];
@@ -297,12 +297,12 @@ const ShukiApp = () => {
       }
       
       // パーソナライズ理由の追加（既存のコードを維持）
-      if (person.tastePreference && person.tastePreference2) {
-        personalizations.push({ 
-          reason: `${person.tastePreference}と${person.tastePreference2}をバランスよく`, 
-          detail: '第一希望から3品、第二希望から2品を選定してバラエティ豊かに構成' 
-        });
-      }
+     if (person.tastePreference && person.tastePreference2) {
+  personalizations.push({ 
+    reason: `${person.tastePreference}と${person.tastePreference2}をバランスよく`, 
+    detail: 'お好みに合わせてAIが10品を厳選 → そこから6品をお選びください' 
+  });
+}
       
       if (allergyList.length > 0) {
         personalizations.push({ 
@@ -983,7 +983,7 @@ if (showMyPage) {
 
                         <div><label className="block text-base font-semibold text-slate-700 mb-3">味の好み（第一希望） <span className="text-orange-500">*</span></label>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['しょっぱいもの好き', 'あっさり・和食系', '甘いもの好き', '辛いもの好き'].map(o => (
+                            {['味濃いめが好き', 'あっさりが好き', '甘いもの好き', '辛いもの好き'].map(o => (
                               <button key={o} onClick={() => updatePerson(personIndex, 'tastePreference', o)} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].tastePreference === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
                             ))}
                           </div>
@@ -991,7 +991,7 @@ if (showMyPage) {
 
                         <div><label className="block text-base font-semibold text-slate-700 mb-3">味の好み（第二希望） <span className="text-orange-500">*</span></label>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['しょっぱいもの好き', 'あっさり・和食系', '甘いもの好き', '辛いもの好き'].map(o => (
+                            {['味濃いめが好き', 'あっさりが好き', '甘いもの好き', '辛いもの好き'].map(o => (
                               <button key={o} onClick={() => updatePerson(personIndex, 'tastePreference2', o)} disabled={formData.persons[personIndex].tastePreference === o} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].tastePreference2 === o ? 'bg-orange-500 text-white shadow-md' : formData.persons[personIndex].tastePreference === o ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
                             ))}
                           </div>
