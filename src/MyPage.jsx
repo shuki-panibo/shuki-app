@@ -65,16 +65,7 @@ const MyPage = ({ user, userDiagnoses, onLogout, onViewDiagnosis, onBackToHome }
     });
   };
 
-  const getStatusBadge = (status) => {
-    const badges = {
-      pending: { text: '審査中', color: 'bg-yellow-100 text-yellow-800' },
-      active: { text: '契約中', color: 'bg-green-100 text-green-800' },
-      paid: { text: '支払い済み', color: 'bg-green-100 text-green-800' },
-      shipped: { text: '発送済み', color: 'bg-blue-100 text-blue-800' },
-      cancelled: { text: 'キャンセル済み', color: 'bg-gray-100 text-gray-800' }
-    };
-    return badges[status] || badges.pending;
-  };
+  
 
   const getSubscriptionStatusBadge = (status) => {
     const badges = {
@@ -145,7 +136,7 @@ const MyPage = ({ user, userDiagnoses, onLogout, onViewDiagnosis, onBackToHome }
   // 診断詳細ビュー
   if (selectedDiagnosis) {
     const diagnosis = selectedDiagnosis;
-    const statusBadge = getStatusBadge(diagnosis.status);
+    
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
@@ -160,9 +151,6 @@ const MyPage = ({ user, userDiagnoses, onLogout, onViewDiagnosis, onBackToHome }
             </button>
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-slate-800">診断詳細</h1>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusBadge.color}`}>
-                {statusBadge.text}
-              </span>
             </div>
             <p className="text-sm text-slate-500 mt-2">{formatDate(diagnosis.timestamp)}</p>
           </div>
@@ -408,7 +396,6 @@ const MyPage = ({ user, userDiagnoses, onLogout, onViewDiagnosis, onBackToHome }
           ) : (
             <div className="space-y-4">
               {userDiagnoses.map((diagnosis) => {
-                const statusBadge = getStatusBadge(diagnosis.status);
                 return (
                   <div
                     key={diagnosis.id}
@@ -420,9 +407,6 @@ const MyPage = ({ user, userDiagnoses, onLogout, onViewDiagnosis, onBackToHome }
                         <Calendar className="w-4 h-4 text-slate-400" />
                         <p className="text-sm text-slate-600">{formatDate(diagnosis.timestamp)}</p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusBadge.color}`}>
-                        {statusBadge.text}
-                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
