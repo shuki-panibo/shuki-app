@@ -23,6 +23,7 @@ const ShukiApp = () => {
   const [userDiagnoses, setUserDiagnoses] = useState([]);
   const [userSelections, setUserSelections] = useState([]); 
   const [paymentMethod, setPaymentMethod] = useState(null); // 'card' または 'bank'
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -614,6 +615,7 @@ const saveDiagnosisToFirestore = async (user, result) => {
 
 // ★修正: paymentMethodを引数で受け取る
 const submitToGoogleForm = async (selectedPaymentMethod) => {
+   setIsSubmitting(true); 
   try {
     console.log('🚀 申し込み処理開始');
     console.log('💳 支払い方法:', selectedPaymentMethod);
@@ -696,6 +698,8 @@ const selectedFoods = rec.boxes.map((box, idx) => {
   } catch (error) {
     console.error('❌ Error!', error.message);
     alert('送信に失敗しました。お手数ですが、もう一度お試しください。');
+  }finally {
+    setIsSubmitting(false);  // ← これを追加！
   }
 };
   const rec = diagnosisResult || (step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 });
@@ -1458,34 +1462,54 @@ if (step === 'business') {
   </p>
   
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-   {/* クレジットカード */}
+{/* クレジットカード */}
 <button
   onClick={() => submitToGoogleForm('card')}
-  disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
+  disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid) || isSubmitting}
   className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
-    agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
+    agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid) && !isSubmitting
       ? 'bg-orange-500 hover:bg-orange-600 transform hover:scale-105 cursor-pointer'
       : 'bg-slate-300 cursor-not-allowed'
   }`}
 >
-  <CreditCard className="w-8 h-8" />
-  <span>クレジットカード決済</span>
-  <span className="text-sm font-normal opacity-90">即時決済・すぐに発送手配</span>
+  {isSubmitting ? (
+    <>
+      <Loader2 className="w-8 h-8 animate-spin" />
+      <span>送信中...</span>
+      <span className="text-sm font-normal opacity-90">しばらくお待ちください</span>
+    </>
+  ) : (
+    <>
+      <CreditCard className="w-8 h-8" />
+      <span>クレジットカード決済</span>
+      <span className="text-sm font-normal opacity-90">即時決済・すぐに発送手配</span>
+    </>
+  )}
 </button>
 
 {/* 銀行振込 */}
 <button
   onClick={() => submitToGoogleForm('bank')}
-  disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
+  disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid) || isSubmitting}
   className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
-    agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
+    agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid) && !isSubmitting
       ? 'bg-blue-500 hover:bg-blue-600 transform hover:scale-105 cursor-pointer'
       : 'bg-slate-300 cursor-not-allowed'
   }`}
 >
-  <Mail className="w-8 h-8" />
-  <span>銀行振込で申し込む</span>
-  <span className="text-sm font-normal opacity-90">振込先をメールでご案内</span>
+  {isSubmitting ? (
+    <>
+      <Loader2 className="w-8 h-8 animate-spin" />
+      <span>送信中...</span>
+      <span className="text-sm font-normal opacity-90">しばらくお待ちください</span>
+    </>
+  ) : (
+    <>
+      <Mail className="w-8 h-8" />
+      <span>銀行振込で申し込む</span>
+      <span className="text-sm font-normal opacity-90">振込先をメールでご案内</span>
+    </>
+  )}
 </button>
   </div>
 </div>
