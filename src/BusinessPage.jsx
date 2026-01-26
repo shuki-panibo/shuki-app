@@ -25,7 +25,7 @@ const BusinessPage = ({ onBack }) => {
     // Google Apps Scriptに送信
     try {
       // ★★★ ここにデプロイしたGASのURLを貼り付けてください ★★★
-      const scriptURL = 'https://script.google.com/macros/s/ここにあなたのスクリプトID/exec';
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyrsQhMMwmwrtiSH1pnXaAwHmpisIA7vX3PPecYHrg2A9l9PyBl5uD0lFRVhBeOoIBn/exec';
       
       const formDataToSubmit = new FormData();
       formDataToSubmit.append('companyName', formData.companyName);
