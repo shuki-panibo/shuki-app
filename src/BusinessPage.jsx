@@ -24,7 +24,7 @@ const BusinessPage = ({ onBack }) => {
     
     // Google Apps Scriptに送信（必要に応じてURLを変更）
     try {
-      const scriptURL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'; // 法人用のスクリプトURLに変更
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyrsQhMMwmwrtiSH1pnXaAwHmpisIA7vX3PPecYHrg2A9l9PyBl5uD0lFRVhBeOoIBn/exec'; // 法人用のスクリプトURLに変更
       const formDataToSubmit = new FormData();
       Object.keys(formData).forEach(key => {
         formDataToSubmit.append(key, formData[key]);
