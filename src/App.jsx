@@ -6,6 +6,8 @@ import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/fir
 import AuthModal from './AuthModal';
 import PolicyPage from './PolicyPage';
 import MyPage from './MyPage';
+// 既存のインポート文の下に追加
+import BusinessPage from './BusinessPage';
 
 const ShukiApp = () => {
   const [step, setStep] = useState(1);
@@ -721,6 +723,11 @@ if (showMyPage) {
   );
 }
 
+// showMyPage の if文の後に追加
+if (step === 'business') {
+  return <BusinessPage onBack={() => handleStepChange(1)} />;
+}
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className={`transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
@@ -764,6 +771,15 @@ if (showMyPage) {
         <button onClick={() => handleStepChange(2)} className="mt-8 sm:mt-12 px-8 sm:px-12 py-4 sm:py-5 bg-orange-500 text-white text-lg sm:text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-lg inline-flex items-center gap-3 min-h-[56px]">
           総合診断を始める<ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
+        <div className="mt-6">
+  <button 
+    onClick={() => handleStepChange('business')} 
+    className="px-6 py-3 bg-slate-700 text-white text-base font-medium rounded-xl hover:bg-slate-800 transition-all inline-flex items-center gap-2 shadow-md"
+  >
+    <span>🏢</span>
+    法人の方はこちら
+  </button>
+</div>
       </div>
     </div>
 
