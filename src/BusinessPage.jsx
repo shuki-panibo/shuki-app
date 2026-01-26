@@ -22,20 +22,27 @@ const BusinessPage = ({ onBack }) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Google Apps Scriptに送信（必要に応じてURLを変更）
+    // Google Apps Scriptに送信
     try {
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyrsQhMMwmwrtiSH1pnXaAwHmpisIA7vX3PPecYHrg2A9l9PyBl5uD0lFRVhBeOoIBn/exec'; // 法人用のスクリプトURLに変更
+      // ★★★ ここにデプロイしたGASのURLを貼り付けてください ★★★
+      const scriptURL = 'https://script.google.com/macros/s/ここにあなたのスクリプトID/exec';
+      
       const formDataToSubmit = new FormData();
-      Object.keys(formData).forEach(key => {
-        formDataToSubmit.append(key, formData[key]);
-      });
+      formDataToSubmit.append('companyName', formData.companyName);
+      formDataToSubmit.append('contactName', formData.contactName);
+      formDataToSubmit.append('email', formData.email);
+      formDataToSubmit.append('phone', formData.phone);
+      formDataToSubmit.append('employeeCount', formData.employeeCount);
+      formDataToSubmit.append('desiredTiming', formData.desiredTiming);
+      formDataToSubmit.append('message', formData.message);
       formDataToSubmit.append('type', 'business_inquiry');
       
-      // 実際の送信処理（コメントアウト中）
-      // await fetch(scriptURL, { method: 'POST', body: formDataToSubmit });
-      
-      // デモ用の遅延
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // GASに送信（mode: 'no-cors'が必要）
+      await fetch(scriptURL, { 
+        method: 'POST', 
+        body: formDataToSubmit,
+        mode: 'no-cors'
+      });
       
       setSubmitted(true);
     } catch (error) {
