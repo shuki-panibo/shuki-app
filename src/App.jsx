@@ -755,37 +755,36 @@ if (step === 'business') {
         </div>
       </div>
     )}
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
-      <div className="max-w-2xl w-full text-center space-y-6 sm:space-y-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-slate-800 rounded-full mb-4">
-          <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-orange-500" />
-        </div>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800">
-          護己 <span className="text-xl sm:text-2xl md:text-3xl text-slate-600">-Shuki-</span>
-        </h1>
-        <p className="text-lg sm:text-xl md:text-2xl text-orange-500 font-medium px-4 leading-relaxed">
-          日常に溶け込む、<br className="sm:hidden" />
-          あなただけの防災。
-        </p>
-        <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto px-4 leading-relaxed">
-          たった1分の質問に答えるだけで、<br />
-          AIがあなたの生活スタイルと<br className="sm:hidden" />防災ニーズに<br className="hidden sm:inline" />
-          最適な備蓄を提案します。
-        </p>
-        <button onClick={() => handleStepChange(2)} className="mt-8 sm:mt-12 px-8 sm:px-12 py-4 sm:py-5 bg-orange-500 text-white text-lg sm:text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-lg inline-flex items-center gap-3 min-h-[56px]">
-          総合診断を始める<ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
-        </button>
-        <div className="mt-6">
-  <button 
-    onClick={() => handleStepChange('business')} 
-    className="px-6 py-3 bg-slate-700 text-white text-base font-medium rounded-xl hover:bg-slate-800 transition-all inline-flex items-center gap-2 shadow-md"
-  >
-    <span>🏢</span>
-    法人の方はこちら
-  </button>
-</div>
-      </div>
+    <div className="min-h-[70vh] flex items-center justify-center p-4 sm:p-6 pt-20">
+  <div className="max-w-3xl w-full text-center space-y-5 sm:space-y-6">
+    <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-slate-800 rounded-full mb-2">
+      <Shield className="w-7 h-7 sm:w-8 sm:h-8 text-orange-500" />
     </div>
+    <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-800">
+      護己 <span className="text-2xl sm:text-3xl md:text-4xl text-slate-600">-Shuki-</span>
+    </h1>
+    <p className="text-xl sm:text-2xl md:text-3xl text-orange-500 font-bold px-4 leading-relaxed">
+      日常に溶け込む、あなただけの防災。
+    </p>
+    <p className="text-lg sm:text-xl md:text-2xl text-slate-700 max-w-2xl mx-auto px-4 leading-relaxed font-medium">
+      たった1分の質問に答えるだけで、<br />
+      AIがあなた専用の備蓄プランを提案します。
+    </p>
+    <div className="pt-4">
+      <button onClick={() => handleStepChange(2)} className="px-10 sm:px-14 py-4 sm:py-5 bg-orange-500 text-white text-xl sm:text-2xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-lg inline-flex items-center gap-3">
+        総合診断を始める<ArrowRight className="w-6 h-6 sm:w-7 sm:h-7" />
+      </button>
+    </div>
+    <div className="pt-2">
+      <button 
+        onClick={() => handleStepChange('business')} 
+        className="px-6 py-3 bg-slate-700 text-white text-base font-medium rounded-xl hover:bg-slate-800 transition-all inline-flex items-center gap-2 shadow-md"
+      >
+        法人の方はこちら
+      </button>
+    </div>
+  </div>
+</div>
 
     {/* サービス説明セクション - Stripe審査用 */}
     <div className="max-w-4xl mx-auto px-4 pb-16">
@@ -803,21 +802,21 @@ if (step === 'business') {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="text-center p-4">
             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📋</span>
+            <span className="text-2xl font-bold text-orange-500">1</span>
             </div>
             <h3 className="font-bold text-gray-800 mb-2">1. 診断</h3>
             <p className="text-sm text-gray-600">家族構成やアレルギーなど簡単な質問に回答</p>
           </div>
           <div className="text-center p-4">
             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🎯</span>
+            <span className="text-2xl font-bold text-orange-500">2</span>
             </div>
             <h3 className="font-bold text-gray-800 mb-2">2. 提案</h3>
             <p className="text-sm text-gray-600">AIがあなたに最適な備蓄プランを提案</p>
           </div>
           <div className="text-center p-4">
             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📦</span>
+              <span className="text-2xl font-bold text-orange-500">3</span>
             </div>
             <h3 className="font-bold text-gray-800 mb-2">3. お届け</h3>
             <p className="text-sm text-gray-600">3年に一度ご自宅に防災食品をお届け</p>
@@ -830,7 +829,7 @@ if (step === 'business') {
      {/* ペルソナ別おすすめ商品例 */}
 <section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
   <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-    🎯 AIがあなたに合わせて選びます
+    AIがあなたに合わせて選びます
   </h2>
   <p className="text-gray-600 text-center mb-8">
     同じ「防災セット」でも、人によって中身は全く違います。<br />
@@ -842,7 +841,7 @@ if (step === 'business') {
     <div className="bg-gradient-to-br from-pink-50 to-orange-50 rounded-2xl p-6 border-2 border-pink-200 hover:shadow-lg transition-all">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-14 h-14 bg-pink-200 rounded-full flex items-center justify-center text-2xl">
-          👩
+          
         </div>
         <div>
           <h3 className="font-bold text-gray-800">30代女性</h3>
@@ -870,7 +869,7 @@ if (step === 'business') {
     <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-6 border-2 border-blue-200 hover:shadow-lg transition-all">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-14 h-14 bg-blue-200 rounded-full flex items-center justify-center text-2xl">
-          👨‍👩‍👧
+        
         </div>
         <div>
           <h3 className="font-bold text-gray-800">40代男性</h3>
@@ -898,7 +897,7 @@ if (step === 'business') {
     <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200 hover:shadow-lg transition-all">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-14 h-14 bg-purple-200 rounded-full flex items-center justify-center text-2xl">
-          👫
+      
         </div>
         <div>
           <h3 className="font-bold text-gray-800">20代カップル</h3>
@@ -929,218 +928,69 @@ if (step === 'business') {
     </p>
   </div>
 </section>
+
 {/* 競合比較表 */}
 <section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
   <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-    📊 あなたに最適な防災対策は？4タイプ徹底比較
+    他社サービスとの比較
   </h2>
   <p className="text-gray-600 text-center mb-8">
-    護己-Shuki-は「買い切り」でも「普通のサブスク」でもない、<br />
-    <strong className="text-orange-600">パーソナライズ×期限管理×本棚常備</strong>の新しい防災サービスです。
+    護己-Shuki-は<strong className="text-orange-600">パーソナライズ×本棚常備</strong>の新しい防災サービスです。
   </p>
 
-  {/* 比較表 */}
-  <div className="overflow-x-auto mb-8">
-    <table className="w-full border-collapse text-xs sm:text-sm">
+  <div className="overflow-x-auto">
+    <table className="w-full border-collapse text-sm">
       <thead>
         <tr>
-          <th className="p-2 sm:p-3 text-left bg-gray-100 border-b-2 border-gray-200 min-w-[100px]"></th>
-          <th className="p-2 sm:p-3 text-center bg-gray-100 border-b-2 border-gray-200 min-w-[90px]">
-            <div className="text-gray-600">
-              <span className="text-lg">🛒</span>
-              <p className="font-medium mt-1 text-xs">買い切り型</p>
-              <p className="text-xs text-gray-400">ECサイト等</p>
-            </div>
+          <th className="p-3 text-left bg-gray-100 border-b-2 border-gray-200"></th>
+          <th className="p-3 text-center bg-gray-100 border-b-2 border-gray-200">
+            <p className="font-medium">買い切り型</p>
+            <p className="text-xs text-gray-500">ECサイト等</p>
           </th>
-          <th className="p-2 sm:p-3 text-center bg-gray-100 border-b-2 border-gray-200 min-w-[90px]">
-            <div className="text-gray-600">
-              <span className="text-lg">📦</span>
-              <p className="font-medium mt-1 text-xs">サブスクA</p>
-              <p className="text-xs text-gray-400">レンタル型</p>
-            </div>
+          <th className="p-3 text-center bg-gray-100 border-b-2 border-gray-200">
+            <p className="font-medium">サブスク型</p>
+            <p className="text-xs text-gray-500">レンタル</p>
           </th>
-          <th className="p-2 sm:p-3 text-center bg-gray-100 border-b-2 border-gray-200 min-w-[90px]">
-            <div className="text-gray-600">
-              <span className="text-lg">📦</span>
-              <p className="font-medium mt-1 text-xs">サブスクB</p>
-              <p className="text-xs text-gray-400">レンタル型</p>
-            </div>
-          </th>
-          <th className="p-2 sm:p-3 text-center bg-orange-500 text-white border-b-2 border-orange-600 rounded-t-lg min-w-[100px]">
-            <div>
-              <span className="text-lg">🛡️</span>
-              <p className="font-bold mt-1 text-xs">護己-Shuki-</p>
-              <p className="text-xs opacity-90">購入型</p>
-            </div>
+          <th className="p-3 text-center bg-orange-500 text-white border-b-2 border-orange-600">
+            <p className="font-bold">護己-Shuki-</p>
+            <p className="text-xs opacity-90">購入型</p>
           </th>
         </tr>
       </thead>
       <tbody>
         <tr className="border-b border-gray-100">
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-gray-50">月額料金</td>
-          <td className="p-2 sm:p-3 text-center">¥0<br /><span className="text-xs text-gray-400">管理は自分</span></td>
-          <td className="p-2 sm:p-3 text-center">¥780〜980</td>
-          <td className="p-2 sm:p-3 text-center">¥980〜2,580</td>
-          <td className="p-2 sm:p-3 text-center bg-orange-50 font-bold text-orange-600">⭐¥500相当<br /><span className="text-xs font-normal">(年¥6,000)</span></td>
+          <td className="p-3 font-medium text-gray-700 bg-gray-50">月額料金</td>
+          <td className="p-3 text-center">¥0<br /><span className="text-xs text-gray-400">管理は自分</span></td>
+          <td className="p-3 text-center">¥780〜2,580</td>
+          <td className="p-3 text-center bg-orange-50 font-bold text-orange-600">¥500相当<br /><span className="text-xs font-normal">(年¥6,000)</span></td>
         </tr>
         <tr className="border-b border-gray-100">
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-gray-50">カスタマイズ性</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕<br /><span className="text-xs text-gray-400">全員同じ</span></td>
-          <td className="p-2 sm:p-3 text-center text-yellow-600">△<br /><span className="text-xs text-gray-400">3パターン</span></td>
-          <td className="p-2 sm:p-3 text-center text-yellow-600">△<br /><span className="text-xs text-gray-400">数パターン</span></td>
-          <td className="p-2 sm:p-3 text-center bg-orange-50 font-bold text-green-600">⭐AI完全個別</td>
+          <td className="p-3 font-medium text-gray-700 bg-gray-50">カスタマイズ性</td>
+          <td className="p-3 text-center text-red-500">なし</td>
+          <td className="p-3 text-center text-yellow-600">数パターン</td>
+          <td className="p-3 text-center bg-orange-50 font-bold text-green-600">AI完全個別</td>
         </tr>
         <tr className="border-b border-gray-100">
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-gray-50">アレルギー対応</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ なし</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ なし</td>
-          <td className="p-2 sm:p-3 text-center text-yellow-600">△ 一部</td>
-          <td className="p-2 sm:p-3 text-center bg-orange-50 font-bold text-green-600">⭐完全対応</td>
-        </tr>
-        <tr className="border-b border-gray-100">
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-gray-50">食や味の好み</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ なし</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ なし</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ なし</td>
-          <td className="p-2 sm:p-3 text-center bg-orange-50 font-bold text-green-600">⭐完全反映<br /><span className="text-xs font-normal text-gray-500">味付け/食材</span></td>
-        </tr>
-        <tr className="border-b border-gray-100">
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-gray-50">ライフスタイル最適化</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ なし</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ なし</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ なし</td>
-          <td className="p-2 sm:p-3 text-center bg-orange-50 font-bold text-green-600">⭐完全対応<br /><span className="text-xs font-normal text-gray-500">家族/住居</span></td>
-        </tr>
-        <tr className="border-b border-gray-100 bg-yellow-50">
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-yellow-100">🎒 防災バッグ<br /><span className="text-xs font-normal">(入れ物)</span></td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ リュック型<br /><span className="text-xs text-gray-400">押し入れへ</span></td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ リュック型<br /><span className="text-xs text-gray-400">押し入れへ</span></td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ リュック型<br /><span className="text-xs text-gray-400">押し入れへ</span></td>
-          <td className="p-2 sm:p-3 text-center bg-orange-100 font-bold text-green-600">⭐A4ボックス型<br /><span className="text-xs font-normal text-orange-600">本棚に常備</span></td>
-        </tr>
-        <tr className="border-b border-gray-100">
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-gray-50">所有権</td>
-          <td className="p-2 sm:p-3 text-center text-green-600">⭐購入</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ レンタル<br /><span className="text-xs text-gray-400">返却必要</span></td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ レンタル<br /><span className="text-xs text-gray-400">返却必要</span></td>
-          <td className="p-2 sm:p-3 text-center bg-orange-50 font-bold text-green-600">⭐購入<br /><span className="text-xs font-normal text-gray-500">返却不要</span></td>
-        </tr>
-        <tr className="border-b border-gray-100">
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-gray-50">消費期限管理</td>
-          <td className="p-2 sm:p-3 text-center text-red-500">✕ 自己管理<br /><span className="text-xs text-gray-400">忘れる</span></td>
-          <td className="p-2 sm:p-3 text-center text-green-600">○ 自動交換</td>
-          <td className="p-2 sm:p-3 text-center text-green-600">○ 自動通知</td>
-          <td className="p-2 sm:p-3 text-center bg-orange-50 font-bold text-green-600">⭐完全自動<br /><span className="text-xs font-normal text-gray-500">3年周期</span></td>
+          <td className="p-3 font-medium text-gray-700 bg-gray-50">食や味の好み</td>
+          <td className="p-3 text-center text-red-500">なし</td>
+          <td className="p-3 text-center text-red-500">なし</td>
+          <td className="p-3 text-center bg-orange-50 font-bold text-green-600">完全反映</td>
         </tr>
         <tr>
-          <td className="p-2 sm:p-3 font-medium text-gray-700 bg-gray-50">期限切れリスク</td>
-          <td className="p-2 sm:p-3 text-center text-red-500 font-bold">✕ 非常に高い</td>
-          <td className="p-2 sm:p-3 text-center text-green-600">○ 低い</td>
-          <td className="p-2 sm:p-3 text-center text-green-600">○ 低い</td>
-          <td className="p-2 sm:p-3 text-center bg-orange-50 font-bold text-green-600">⭐ゼロ</td>
+          <td className="p-3 font-medium text-gray-700 bg-gray-50">防災バッグ</td>
+          <td className="p-3 text-center">リュック型<br /><span className="text-xs text-gray-400">押し入れへ</span></td>
+          <td className="p-3 text-center">リュック型<br /><span className="text-xs text-gray-400">押し入れへ</span></td>
+          <td className="p-3 text-center bg-orange-50 font-bold text-green-600">A4ボックス型<br /><span className="text-xs font-normal text-orange-600">本棚に常備</span></td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  {/* 防災バッグ形状の比較 */}
-  <div className="bg-gradient-to-r from-gray-50 to-orange-50 rounded-2xl p-6 mb-6">
-    <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">
-      🎒 なぜ「防災バッグの形状」が重要なのか？
-    </h3>
-    
-    <div className="grid md:grid-cols-2 gap-6">
-      {/* 従来型の問題 */}
-      <div className="bg-white rounded-xl p-5 border-2 border-red-200">
-        <h4 className="font-bold text-red-600 mb-4 flex items-center gap-2">
-          <span className="text-xl">❌</span> 従来のリュック型の問題
-        </h4>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-2xl">🎒</span>
-            <span className="text-gray-600">リュック型防災バッグ</span>
-          </div>
-          <div className="text-center text-gray-400">↓</div>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-2xl">📦</span>
-            <span className="text-gray-600">押し入れ・クローゼットへ</span>
-          </div>
-          <div className="text-center text-gray-400">↓</div>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-2xl">🤔</span>
-            <span className="text-gray-600">「どこにしまったっけ？」</span>
-          </div>
-          <div className="text-center text-gray-400">↓</div>
-          <div className="flex items-center gap-3 text-sm bg-red-50 rounded-lg p-2">
-            <span className="text-2xl">😱</span>
-            <span className="text-red-600 font-semibold">災害時に見つからない！</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 護己の革新 */}
-      <div className="bg-white rounded-xl p-5 border-2 border-green-200">
-        <h4 className="font-bold text-green-600 mb-4 flex items-center gap-2">
-          <span className="text-xl">⭐</span> 護己の革新：A4ボックス型
-        </h4>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-2xl">📚</span>
-            <span className="text-gray-600">A4ファイルボックス型</span>
-          </div>
-          <div className="text-center text-green-500">↓</div>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-2xl">📖</span>
-            <span className="text-gray-600">本棚・デスク横に常備</span>
-          </div>
-          <div className="text-center text-green-500">↓</div>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-2xl">👀</span>
-            <span className="text-gray-600">日常的に目に入る</span>
-          </div>
-          <div className="text-center text-green-500">↓</div>
-          <div className="flex items-center gap-3 text-sm bg-green-50 rounded-lg p-2">
-            <span className="text-2xl">🏃</span>
-            <span className="text-green-600 font-semibold">災害時、3秒で持ち出し！</span>
-          </div>
-        </div>
-        
-        {/* 今後の展開 */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <p className="text-xs font-semibold text-orange-600 mb-2">🏠 今後の展開</p>
-          <p className="text-xs text-gray-500">家具一体型防災バッグ開発予定<br />サイドテーブルなどの家具と一体化、インテリアとしての防災</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* 護己の4つの強み */}
-  <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
-    <h3 className="text-lg font-bold text-orange-600 mb-4 text-center">
-      🎯 護己-Shuki- 4つの決定的な強み
-    </h3>
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div className="bg-white rounded-lg p-4 text-center">
-        <span className="text-2xl mb-2 block">🤖</span>
-        <p className="text-sm font-bold text-gray-800">AIパーソナライズ</p>
-        <p className="text-xs text-gray-500 mt-1">業界唯一</p>
-      </div>
-      <div className="bg-white rounded-lg p-4 text-center">
-        <span className="text-2xl mb-2 block">💰</span>
-        <p className="text-sm font-bold text-gray-800">圧倒的な安さ</p>
-        <p className="text-xs text-gray-500 mt-1">他社の半額以下</p>
-      </div>
-      <div className="bg-white rounded-lg p-4 text-center">
-        <span className="text-2xl mb-2 block">📚</span>
-        <p className="text-sm font-bold text-gray-800">本棚常備型</p>
-        <p className="text-xs text-gray-500 mt-1">忘れない防災</p>
-      </div>
-      <div className="bg-white rounded-lg p-4 text-center">
-        <span className="text-2xl mb-2 block">🎨</span>
-        <p className="text-sm font-bold text-gray-800">完全カスタマイズ</p>
-        <p className="text-xs text-gray-500 mt-1">中身も外側も</p>
-      </div>
-    </div>
+  <div className="mt-6 bg-orange-50 rounded-xl p-4 border border-orange-200">
+    <p className="text-sm text-gray-700 text-center">
+      <strong className="text-orange-600">護己の強み：</strong>
+      3年に一度、期限が切れる前に新しいセットをお届け。本棚に置けるから忘れない。
+    </p>
   </div>
 </section>
 
