@@ -825,7 +825,112 @@ if (step === 'business') {
         </div>
       </section>
 
-     {/* 料金プラン */}
+    
+      
+     {/* ペルソナ別おすすめ商品例 */}
+<section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+    🎯 AIがあなたに合わせて選びます
+  </h2>
+  <p className="text-gray-600 text-center mb-8">
+    同じ「防災セット」でも、人によって中身は全く違います。<br />
+    あなたのライフスタイルに最適な組み合わせをAIが提案。
+  </p>
+
+  <div className="grid md:grid-cols-3 gap-6">
+    {/* ペルソナ1: 一人暮らし女性 */}
+    <div className="bg-gradient-to-br from-pink-50 to-orange-50 rounded-2xl p-6 border-2 border-pink-200 hover:shadow-lg transition-all">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-14 h-14 bg-pink-200 rounded-full flex items-center justify-center text-2xl">
+          👩
+        </div>
+        <div>
+          <h3 className="font-bold text-gray-800">30代女性</h3>
+          <p className="text-xs text-gray-500">一人暮らし・マンション</p>
+        </div>
+      </div>
+      <div className="bg-white rounded-xl p-4 mb-4">
+        <p className="text-xs text-orange-600 font-semibold mb-2">💡 AIの提案ポイント</p>
+        <p className="text-sm text-gray-600">あっさり味好き＋女性用衛生用品を追加</p>
+      </div>
+      <div className="space-y-2">
+        <p className="text-xs font-semibold text-gray-700">おすすめ食品例：</p>
+        <div className="flex flex-wrap gap-2">
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍚 梅がゆ</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍜 うどん味</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🐟 いわしの煮付</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍲 筑前煮</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍲 豚汁</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍠 さつま芋のレモン煮</span>
+        </div>
+      </div>
+    </div>
+
+    {/* ペルソナ2: ファミリー（アレルギーあり） */}
+    <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-6 border-2 border-blue-200 hover:shadow-lg transition-all">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-14 h-14 bg-blue-200 rounded-full flex items-center justify-center text-2xl">
+          👨‍👩‍👧
+        </div>
+        <div>
+          <h3 className="font-bold text-gray-800">40代男性</h3>
+          <p className="text-xs text-gray-500">4人家族・戸建て・子供に小麦アレルギー</p>
+        </div>
+      </div>
+      <div className="bg-white rounded-xl p-4 mb-4">
+        <p className="text-xs text-blue-600 font-semibold mb-2">💡 AIの提案ポイント</p>
+        <p className="text-sm text-gray-600">小麦不使用食品のみ＋味濃いめ＋量多め</p>
+      </div>
+      <div className="space-y-2">
+        <p className="text-xs font-semibold text-gray-700">おすすめ食品例：</p>
+        <div className="flex flex-wrap gap-2">
+          <span className="bg-yellow-100 px-2 py-1 rounded text-xs border border-yellow-300">⚠️ 小麦不使用</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍚 尾西の白飯</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍛 尾西のドライカレー</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍜 米粉カレーうどん</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍲 豚汁</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🎃 かぼちゃ煮</span>
+        </div>
+      </div>
+    </div>
+
+    {/* ペルソナ3: 若いカップル */}
+    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200 hover:shadow-lg transition-all">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-14 h-14 bg-purple-200 rounded-full flex items-center justify-center text-2xl">
+          👫
+        </div>
+        <div>
+          <h3 className="font-bold text-gray-800">20代カップル</h3>
+          <p className="text-xs text-gray-500">アパート・麺派・辛いもの好き</p>
+        </div>
+      </div>
+      <div className="bg-white rounded-xl p-4 mb-4">
+        <p className="text-xs text-purple-600 font-semibold mb-2">💡 AIの提案ポイント</p>
+        <p className="text-sm text-gray-600">麺類中心＋スパイシー系を多め</p>
+      </div>
+      <div className="space-y-2">
+        <p className="text-xs font-semibold text-gray-700">おすすめ食品例：</p>
+        <div className="flex flex-wrap gap-2">
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍜 しょうゆラーメン味</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍝 ペペロンチーノ</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍛 ポークカレー</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍖 ハンバーグトマト煮</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍗 鶏と野菜のトマト煮</span>
+          <span className="bg-white px-2 py-1 rounded text-xs border">🍜 チゲ風味ラーメン</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="mt-8 text-center">
+    <p className="text-sm text-gray-500 mb-4">
+      ※上記は一例です。診断結果に基づき、さらに細かくカスタマイズされます。
+    </p>
+  </div>
+</section>
+
+       {/* 料金プラン */}
 <section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
   <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
     料金プラン
@@ -834,7 +939,7 @@ if (step === 'business') {
     <div className="grid md:grid-cols-2 gap-6">
       {/* 初期費用 */}
       <div className="border-2 border-orange-400 rounded-xl p-6 text-center">
-        <p className="text-gray-600 mb-2">初期費用（商品代）</p>
+        <p className="text-gray-600 mb-2">防災バッグ代（初回）</p>
         <p className="text-4xl font-bold text-orange-500 mb-2">
           ¥9,980<span className="text-lg font-normal text-gray-500">〜</span>
         </p>
@@ -855,44 +960,16 @@ if (step === 'business') {
         <ul className="text-left text-sm text-gray-600 space-y-2">
           <li>✓ 賞味期限管理サービス</li>
           <li>✓ 期限前の自動お知らせ</li>
-          <li>✓ 入れ替え時期のご案内</li>
+          <li>✓ <strong className="text-orange-600">3年ごとに保存食を入れ替え</strong></li>
         </ul>
       </div>
     </div>
     <p className="text-xs text-gray-500 mt-6 text-center">
-      ※ご家族の人数や選択オプションにより初期費用が変動します<br />
-      ※商品は3年周期でお届け（今後2年・1年周期も導入予定）
+      ※ご家族の人数や選択オプションにより防災バッグ代が変動します<br />
+      <strong className="text-orange-600">※商品は3年周期でお届け</strong>（今後2年・1年周期も導入予定）
     </p>
   </div>
 </section>
-
-      {/* 届く商品例 */}
-      <section className="bg-white rounded-2xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          お届けする商品例
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-50 rounded-lg p-4 text-center">
-            <span className="text-3xl mb-2 block">🍚</span>
-            <p className="text-sm font-medium">アルファ米</p>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 text-center">
-            <span className="text-3xl mb-2 block">🥫</span>
-            <p className="text-sm font-medium">缶詰・レトルト</p>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 text-center">
-            <span className="text-3xl mb-2 block">💧</span>
-            <p className="text-sm font-medium">長期保存水</p>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 text-center">
-            <span className="text-3xl mb-2 block">🍪</span>
-            <p className="text-sm font-medium">栄養補助食品</p>
-          </div>
-        </div>
-        <p className="text-sm text-gray-500 mt-6 text-center">
-          ※診断結果に基づき、最適な商品を組み合わせてお届けします
-        </p>
-      </section>
     </div>
   </>
 )}
