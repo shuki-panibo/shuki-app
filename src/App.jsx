@@ -602,17 +602,6 @@ const saveDiagnosisToFirestore = async (user, result) => {
     }
   };
   
-  useEffect(() => {
-    if (step === 3) {
-      const t = setTimeout(() => {
-        // 常にログインモーダルを表示
-        setShowAuthModal(true);
-      }, 3000);
-      return () => clearTimeout(t);
-    }
-  }, [step]);
-
-
 // ★修正: paymentMethodを引数で受け取る
 const submitToGoogleForm = async (selectedPaymentMethod) => {
    setIsSubmitting(true); 
@@ -1022,279 +1011,287 @@ if (step === 'business') {
   </>
 )}
 
-        {step === 2 && (
-          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12">
-            <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8 md:p-12">
-              <div className="mb-6 sm:mb-8">
-                <div className="flex items-center gap-3 mb-4"><Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-orange-500" /><h2 className="text-2xl sm:text-3xl font-bold text-slate-800">AI総合診断</h2></div>
-                <p className="text-sm sm:text-base text-slate-600 leading-relaxed">あなたの生活スタイルと防災ニーズから、最適な備蓄をご提案します。</p>
-              </div>
+{step === 2 && (
+  <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12">
+    <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8 md:p-12">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-orange-500" />
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">AI総合診断</h2>
+        </div>
+        <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+          あなたの生活スタイルと防災ニーズから、最適な備蓄をご提案します。
+        </p>
+      </div>
 
-              <div className="space-y-6 sm:space-y-8">
-                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3">お名前 <span className="text-orange-500">*</span></label>
-                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]" placeholder="山田 太郎" /></div>
+      <div className="space-y-6 sm:space-y-8">
+        {/* ★削除: お名前、メールアドレス、電話番号 */}
 
-                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Mail className="w-5 h-5 text-orange-500" />メールアドレス <span className="text-orange-500">*</span></label>
-                  <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]" placeholder="example@email.com" /></div>
-
-                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3">電話番号 <span className="text-orange-500">*</span></label>
-                  <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]" placeholder="090-1234-5678" /></div>
-
-                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><Home className="w-5 h-5 text-orange-500" />居住環境 <span className="text-orange-500">*</span></label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {[
-                      { value: 'mansion', label: 'マンション', emoji: '🏢' },
-                      { value: 'house', label: '戸建て', emoji: '🏠' },
-                      { value: 'apartment', label: 'アパート', emoji: '🏘️' }
-                    ].map(opt => (
-                      <button key={opt.value} onClick={() => setFormData({...formData, livingEnvironment: opt.value})} className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.livingEnvironment === opt.value ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-                        <span className="mr-2">{opt.emoji}</span>{opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-orange-500" />
-                    何人分の防災セットが必要ですか？ <span className="text-orange-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-                    {[1, 2, 3].map(num => (
-                      <button 
-                        key={num} 
-                        onClick={() => setPersonCount(num)} 
-                        className={`px-6 py-4 rounded-xl font-medium transition-all ${personCount === num ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                      >
-                        {num}人
-                      </button>
-                    ))}
-                    <button 
-                      onClick={addPerson}
-                      disabled={personCount >= 10}
-                      className={`px-4 py-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${personCount >= 10 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'}`}
-                    >
-                      <span className="text-xl">+</span> 人を追加
-                    </button>
-                  </div>
-                  {personCount > 3 && (
-                    <div className="text-sm text-slate-600 bg-orange-50 rounded-lg p-3">
-                      現在 <strong className="text-orange-600">{personCount}人分</strong> 選択中（最大10人まで）
-                    </div>
-                  )}
-                </div>
-
-                {personCount > 0 && (
-                  <>
-                    {[...Array(getPersonCount())].map((_, personIndex) => (
-                      <div key={personIndex} className="bg-slate-50 rounded-2xl p-6 space-y-6">
-                        <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                          <User className="w-6 h-6 text-orange-500" />
-                          {getPersonCount() === 1 ? 'あなたの情報' : `${personIndex + 1}人目の情報`}
-                        </h3>
-
-                        <div><label className="block text-base font-semibold text-slate-700 mb-3">年齢区分 <span className="text-orange-500">*</span></label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['18歳未満', '18-29歳', '30-49歳', '50歳以上'].map(o => (
-                              <button key={o} onClick={() => updatePerson(personIndex, 'age', o)} className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.persons[personIndex].age === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div><label className="block text-base font-semibold text-slate-700 mb-3">性別 <span className="text-orange-500">*</span></label>
-                          <div className="grid grid-cols-3 gap-3">
-                            {['男性', '女性', '回答しない'].map(o => (
-                              <button key={o} onClick={() => updatePerson(personIndex, 'gender', o)} className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.persons[personIndex].gender === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div><label className="block text-base font-semibold text-slate-700 mb-3">アレルギー（複数選択可）</label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['特になし', '卵', '乳製品', '小麦', 'そば', '落花生', 'えび', 'かに'].map(o => (
-                              <button key={o} onClick={() => handleMultiSelect(personIndex, 'allergies', o)} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].allergies.includes(o) ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
-                            ))}
-                          </div>
-                          <input type="text" value={formData.persons[personIndex].allergyOther} onChange={(e) => updatePerson(personIndex, 'allergyOther', e.target.value)} className="w-full mt-3 px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none" placeholder="その他のアレルギーがあれば記入してください" />
-                        </div>
-
-                        <div><label className="block text-base font-semibold text-slate-700 mb-3 flex items-center gap-2"><Utensils className="w-5 h-5 text-orange-500" />食の好み <span className="text-orange-500">*</span></label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['ご飯派', 'パン派', '麺派', 'こだわりなし'].map(o => (
-                              <button key={o} onClick={() => updatePerson(personIndex, 'foodPreference', o)} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].foodPreference === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div><label className="block text-base font-semibold text-slate-700 mb-3">味の好み（第一希望） <span className="text-orange-500">*</span></label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['味濃いめが好き', 'あっさりが好き', '甘いもの好き', '辛いもの好き'].map(o => (
-                              <button key={o} onClick={() => updatePerson(personIndex, 'tastePreference', o)} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].tastePreference === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div><label className="block text-base font-semibold text-slate-700 mb-3">味の好み（第二希望） <span className="text-orange-500">*</span></label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['味濃いめが好き', 'あっさりが好き', '甘いもの好き', '辛いもの好き'].map(o => (
-                              <button key={o} onClick={() => updatePerson(personIndex, 'tastePreference2', o)} disabled={formData.persons[personIndex].tastePreference === o} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].tastePreference2 === o ? 'bg-orange-500 text-white shadow-md' : formData.persons[personIndex].tastePreference === o ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
-                            ))}
-                          </div>
-                          <p className="text-sm text-slate-500 mt-2">※第一希望と異なる好みを選択してください</p>
-                        </div>
-                      </div>
-                    ))}
-                  </>
-                )}
-
-                <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-orange-500" />現在の備え <span className="text-orange-500">*</span></label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {[
-                      { value: 'none', label: '全くない', emoji: '❌' },
-                      { value: 'water', label: '水はある', emoji: '💧' },
-                      { value: 'expired', label: '期限切れが心配', emoji: '📅' }
-                    ].map(opt => (
-                      <button key={opt.value} onClick={() => setFormData({...formData, currentPreparation: opt.value})} className={`px-4 py-4 sm:py-3 rounded-xl font-medium transition-all min-h-[80px] sm:min-h-0 flex flex-col sm:flex-row items-center justify-center gap-2 ${formData.currentPreparation === opt.value ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-                        <span className="text-2xl sm:text-xl">{opt.emoji}</span>
-                        <span className="text-sm sm:text-base leading-tight text-center sm:text-left">{opt.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-<div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 space-y-6 mt-8">
-
-  <div className="flex items-center gap-3 mb-4">
-    <MapPin className="w-6 h-6 text-blue-600" />
-    <h3 className="text-xl font-bold text-slate-800">配送先住所</h3>
-  </div>
-
-  {/* 郵便番号 */}
-  <div>
-    <label className="block text-base font-semibold text-slate-700 mb-3">
-      郵便番号 <span className="text-orange-500">*</span>
-    </label>
-    <input
-      type="text"
-      value={formData.shippingAddress.postalCode}
-      onChange={(e) => setFormData({
-        ...formData, 
-        shippingAddress: {...formData.shippingAddress, postalCode: e.target.value}
-      })}
-      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
-      placeholder="123-4567"
-    />
-  </div>
-
-  {/* 都道府県 */}
-  <div>
-    <label className="block text-base font-semibold text-slate-700 mb-3">
-      都道府県 <span className="text-orange-500">*</span>
-    </label>
-    <input
-      type="text"
-      value={formData.shippingAddress.prefecture}
-      onChange={(e) => setFormData({
-        ...formData, 
-        shippingAddress: {...formData.shippingAddress, prefecture: e.target.value}
-      })}
-      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
-      placeholder="東京都"
-    />
-  </div>
-
-  {/* 市区町村 */}
-  <div>
-    <label className="block text-base font-semibold text-slate-700 mb-3">
-      市区町村 <span className="text-orange-500">*</span>
-    </label>
-    <input
-      type="text"
-      value={formData.shippingAddress.city}
-      onChange={(e) => setFormData({
-        ...formData, 
-        shippingAddress: {...formData.shippingAddress, city: e.target.value}
-      })}
-      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
-      placeholder="渋谷区"
-    />
-  </div>
-
-  {/* 番地 */}
-  <div>
-    <label className="block text-base font-semibold text-slate-700 mb-3">
-      番地 <span className="text-orange-500">*</span>
-    </label>
-    <input
-      type="text"
-      value={formData.shippingAddress.address}
-      onChange={(e) => setFormData({
-        ...formData, 
-        shippingAddress: {...formData.shippingAddress, address: e.target.value}
-      })}
-      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
-      placeholder="1-2-3"
-    />
-  </div>
-
-  {/* 建物名・部屋番号 */}
-  <div>
-    <label className="block text-base font-semibold text-slate-700 mb-3">
-      建物名・部屋番号
-    </label>
-    <input
-      type="text"
-      value={formData.shippingAddress.building}
-      onChange={(e) => setFormData({
-        ...formData, 
-        shippingAddress: {...formData.shippingAddress, building: e.target.value}
-      })}
-      className="w-full px-4 py-3 sm:py-4 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none min-h-[48px]"
-      placeholder="〇〇マンション101号室（任意）"
-    />
-  </div>
-</div>
-
-              <div className="mt-10 flex justify-end">
-  <button 
-    onClick={() => handleStepChange(3)} 
-    disabled={
-      !formData.name || 
-      !formData.email || 
-      !formData.phone || 
-      !formData.livingEnvironment || 
-      personCount === 0 || 
-      !formData.currentPreparation ||
-      !formData.shippingAddress.postalCode ||
-      !formData.shippingAddress.prefecture ||
-      !formData.shippingAddress.city ||
-      !formData.shippingAddress.address ||
-      formData.persons.slice(0, getPersonCount()).some(p => 
-        !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
-      )
-    } 
-    className="px-10 py-4 bg-orange-500 text-white text-lg font-bold rounded-xl hover:bg-orange-600 transition-all disabled:bg-slate-300 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-lg">
-    AI診断結果を見る<Sparkles className="w-5 h-5" />
-  </button>
-</div>
-            </div>
+        <div>
+          <label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
+            <Home className="w-5 h-5 text-orange-500" />居住環境 <span className="text-orange-500">*</span>
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { value: 'mansion', label: 'マンション', emoji: '🏢' },
+              { value: 'house', label: '戸建て', emoji: '🏠' },
+              { value: 'apartment', label: 'アパート', emoji: '🏘️' }
+            ].map(opt => (
+              <button key={opt.value} onClick={() => setFormData({...formData, livingEnvironment: opt.value})} className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.livingEnvironment === opt.value ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+                <span className="mr-2">{opt.emoji}</span>{opt.label}
+              </button>
+            ))}
           </div>
+        </div>
+
+        <div>
+          <label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
+            <Users className="w-5 h-5 text-orange-500" />
+            何人分の防災セットが必要ですか？ <span className="text-orange-500">*</span>
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+            {[1, 2, 3].map(num => (
+              <button 
+                key={num} 
+                onClick={() => setPersonCount(num)} 
+                className={`px-6 py-4 rounded-xl font-medium transition-all ${personCount === num ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+              >
+                {num}人
+              </button>
+            ))}
+            <button 
+              onClick={addPerson}
+              disabled={personCount >= 10}
+              className={`px-4 py-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${personCount >= 10 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'}`}
+            >
+              <span className="text-xl">+</span> 人を追加
+            </button>
+          </div>
+          {personCount > 3 && (
+            <div className="text-sm text-slate-600 bg-orange-50 rounded-lg p-3">
+              現在 <strong className="text-orange-600">{personCount}人分</strong> 選択中（最大10人まで）
+            </div>
+          )}
+        </div>
+
+        {personCount > 0 && (
+          <>
+            {[...Array(getPersonCount())].map((_, personIndex) => (
+              <div key={personIndex} className="bg-slate-50 rounded-2xl p-6 space-y-6">
+                <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                  <User className="w-6 h-6 text-orange-500" />
+                  {getPersonCount() === 1 ? 'あなたの情報' : `${personIndex + 1}人目の情報`}
+                </h3>
+
+                <div><label className="block text-base font-semibold text-slate-700 mb-3">年齢区分 <span className="text-orange-500">*</span></label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {['18歳未満', '18-29歳', '30-49歳', '50歳以上'].map(o => (
+                      <button key={o} onClick={() => updatePerson(personIndex, 'age', o)} className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.persons[personIndex].age === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div><label className="block text-base font-semibold text-slate-700 mb-3">性別 <span className="text-orange-500">*</span></label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {['男性', '女性', '回答しない'].map(o => (
+                      <button key={o} onClick={() => updatePerson(personIndex, 'gender', o)} className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.persons[personIndex].gender === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div><label className="block text-base font-semibold text-slate-700 mb-3">アレルギー（複数選択可）</label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {['特になし', '卵', '乳製品', '小麦', 'そば', '落花生', 'えび', 'かに'].map(o => (
+                      <button key={o} onClick={() => handleMultiSelect(personIndex, 'allergies', o)} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].allergies.includes(o) ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
+                    ))}
+                  </div>
+                  <input type="text" value={formData.persons[personIndex].allergyOther} onChange={(e) => updatePerson(personIndex, 'allergyOther', e.target.value)} className="w-full mt-3 px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none" placeholder="その他のアレルギーがあれば記入してください" />
+                </div>
+
+                <div><label className="block text-base font-semibold text-slate-700 mb-3 flex items-center gap-2"><Utensils className="w-5 h-5 text-orange-500" />食の好み <span className="text-orange-500">*</span></label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {['ご飯派', 'パン派', '麺派', 'こだわりなし'].map(o => (
+                      <button key={o} onClick={() => updatePerson(personIndex, 'foodPreference', o)} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].foodPreference === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div><label className="block text-base font-semibold text-slate-700 mb-3">味の好み（第一希望） <span className="text-orange-500">*</span></label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {['味濃いめが好き', 'あっさりが好き', '甘いもの好き', '辛いもの好き'].map(o => (
+                      <button key={o} onClick={() => updatePerson(personIndex, 'tastePreference', o)} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].tastePreference === o ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div><label className="block text-base font-semibold text-slate-700 mb-3">味の好み（第二希望） <span className="text-orange-500">*</span></label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {['味濃いめが好き', 'あっさりが好き', '甘いもの好き', '辛いもの好き'].map(o => (
+                      <button key={o} onClick={() => updatePerson(personIndex, 'tastePreference2', o)} disabled={formData.persons[personIndex].tastePreference === o} className={`px-3 py-2 rounded-xl font-medium transition-all text-sm ${formData.persons[personIndex].tastePreference2 === o ? 'bg-orange-500 text-white shadow-md' : formData.persons[personIndex].tastePreference === o ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{o}</button>
+                    ))}
+                  </div>
+                  <p className="text-sm text-slate-500 mt-2">※第一希望と異なる好みを選択してください</p>
+                </div>
+              </div>
+            ))}
+          </>
         )}
 
-        {step === 3 && (
-          <div className="min-h-screen flex items-center justify-center p-6">
-            <div className="text-center space-y-8">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-orange-500 to-orange-700 rounded-full animate-pulse">
-                <Sparkles className="w-12 h-12 text-white" />
-              </div>
-              <h2 className="text-3xl font-bold text-slate-800">AIが最適な防災セットを構成中...</h2>
-              <p className="text-lg text-slate-600">あなたの生活スタイルと防災ニーズを分析しています</p>
-              <div className="max-w-md mx-auto h-2 bg-slate-200 rounded-full overflow-hidden">
-                <div className="h-full bg-orange-500 rounded-full animate-pulse" style={{width: '70%'}}></div>
-              </div>
+        <div><label className="block text-base sm:text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-orange-500" />現在の備え <span className="text-orange-500">*</span></label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { value: 'none', label: '全くない', emoji: '❌' },
+              { value: 'water', label: '水はある', emoji: '💧' },
+              { value: 'expired', label: '期限切れが心配', emoji: '📅' }
+            ].map(opt => (
+              <button key={opt.value} onClick={() => setFormData({...formData, currentPreparation: opt.value})} className={`px-4 py-4 sm:py-3 rounded-xl font-medium transition-all min-h-[80px] sm:min-h-0 flex flex-col sm:flex-row items-center justify-center gap-2 ${formData.currentPreparation === opt.value ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+                <span className="text-2xl sm:text-xl">{opt.emoji}</span>
+                <span className="text-sm sm:text-base leading-tight text-center sm:text-left">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ★削除: 配送先住所セクション */}
+      </div>
+
+      <div className="mt-10 flex justify-end">
+        <button 
+          onClick={() => handleStepChange(3)} 
+          disabled={
+            !formData.livingEnvironment || 
+            personCount === 0 || 
+            !formData.currentPreparation ||
+            formData.persons.slice(0, getPersonCount()).some(p => 
+              !p.age || !p.gender || !p.foodPreference || !p.tastePreference || !p.tastePreference2
+            )
+          } 
+          className="px-10 py-4 bg-orange-500 text-white text-lg font-bold rounded-xl hover:bg-orange-600 transition-all disabled:bg-slate-300 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-lg">
+          診断結果を見る<Sparkles className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+       {step === 3 && (
+  <div className="min-h-screen py-12 px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto">
+      {/* タイトル */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full mb-4">
+          <Sparkles className="w-8 h-8 text-white" />
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
+          診断結果が出ました！
+        </h2>
+        <p className="text-slate-600">あなたの防災タイプが判明しました</p>
+      </div>
+
+      {/* 防災タイプ（見せる部分） */}
+      <div className="bg-gradient-to-br from-orange-500 to-orange-700 rounded-3xl shadow-xl p-8 text-white mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <CheckCircle2 className="w-6 h-6" />
+          <span className="text-base font-medium opacity-90">あなたの防災タイプ</span>
+        </div>
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-5xl">{generateDisasterType().icon}</span>
+          <h2 className="text-3xl sm:text-4xl font-bold">{generateDisasterType().type}</h2>
+        </div>
+        <p className="text-base opacity-90 leading-relaxed">
+          {generateDisasterType().advice.split('。')[0]}。
+        </p>
+      </div>
+
+      {/* プレビュー概要（ぼかし部分） */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6 relative overflow-hidden">
+        <div className="flex items-center gap-3 mb-4">
+          <Package className="w-6 h-6 text-orange-500" />
+          <h3 className="text-xl font-bold text-slate-800">あなた専用の防災セット</h3>
+        </div>
+        
+        {/* ぼかしオーバーレイ */}
+        <div className="relative">
+          <div className="blur-sm pointer-events-none">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+              {['保存水', 'LEDライト', '簡易トイレ', 'アルミブランケット', '備蓄食品×6', '衛生用品'].map((item, i) => (
+                <div key={i} className="bg-slate-100 rounded-lg p-3 text-center">
+                  <span className="text-sm text-slate-600">{item}</span>
+                </div>
+              ))}
+            </div>
+            <div className="bg-orange-50 rounded-xl p-4">
+              <p className="text-slate-700">
+                <span className="font-bold text-orange-600">初期費用:</span> ¥●,●●●〜
+              </p>
+              <p className="text-slate-700">
+                <span className="font-bold text-orange-600">年会費:</span> ¥●,●●●/年
+              </p>
             </div>
           </div>
-        )}
+          
+          {/* ログイン誘導オーバーレイ */}
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl">
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-8 h-8 text-orange-500" />
+              </div>
+              <p className="text-lg font-bold text-slate-800 mb-2">
+                詳細を見るにはログインが必要です
+              </p>
+              <p className="text-sm text-slate-600 mb-4">
+                無料アカウント登録で、あなた専用の<br />備蓄プランをすべてご覧いただけます
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ログイン/登録ボタン */}
+      <div className="space-y-4">
+        <button
+          onClick={() => setShowAuthModal(true)}
+          className="w-full px-8 py-5 bg-orange-500 text-white text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-[1.02] shadow-lg flex items-center justify-center gap-3"
+        >
+          <Mail className="w-6 h-6" />
+          ログイン / 無料登録して詳細を見る
+        </button>
+        
+        <button
+          onClick={() => handleStepChange(1)}
+          className="w-full px-6 py-3 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-all"
+        >
+          最初からやり直す
+        </button>
+      </div>
+
+      {/* メリット説明 */}
+      <div className="mt-8 bg-slate-50 rounded-xl p-6">
+        <h4 className="font-bold text-slate-800 mb-4 text-center">無料登録するとできること</h4>
+        <div className="grid sm:grid-cols-3 gap-4">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+            <span className="text-sm text-slate-600">あなた専用の食品リストを確認</span>
+          </div>
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+            <span className="text-sm text-slate-600">好みに合わせて食品を選択</span>
+          </div>
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+            <span className="text-sm text-slate-600">診断結果を保存・いつでも確認</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <AuthModal 
+      isOpen={showAuthModal} 
+      onClose={() => setShowAuthModal(false)} 
+      onSuccess={handleAuthSuccess} 
+    />
+  </div>
+)}
 
 {step === 4 && (
   <div className="min-h-screen py-12 px-6">
@@ -1580,71 +1577,21 @@ if (step === 'business') {
           </div>
         )}
 
-       {/* 支払い方法選択ボタン */}
+{/* 支払い方法選択ボタン → 申込みへ進むボタンに変更 */}
 <div className="space-y-4">
-  <p className="text-center text-lg font-bold text-slate-800 mb-4">
-    💳 お支払い方法を選択してください
-  </p>
-  
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-{/* クレジットカード */}
-<button
-  onClick={() => submitToGoogleForm('card')}
-  disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid) || isSubmitting}
-  className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
-    agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid) && !isSubmitting
-      ? 'bg-orange-500 hover:bg-orange-600 transform hover:scale-105 cursor-pointer'
-      : 'bg-slate-300 cursor-not-allowed'
-  }`}
->
-  {isSubmitting ? (
-    <>
-      <Loader2 className="w-8 h-8 animate-spin" />
-      <span>送信中...</span>
-      <span className="text-sm font-normal opacity-90">しばらくお待ちください</span>
-    </>
-  ) : (
-    <>
-      <CreditCard className="w-8 h-8" />
-      <span>クレジットカード決済</span>
-      <span className="text-sm font-normal opacity-90">即時決済・すぐに発送手配</span>
-    </>
-  )}
-</button>
-
-{/* 銀行振込 */}
-<button
-  onClick={() => submitToGoogleForm('bank')}
-  disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid) || isSubmitting}
-  className={`px-8 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-3 ${
-    agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid) && !isSubmitting
-      ? 'bg-blue-500 hover:bg-blue-600 transform hover:scale-105 cursor-pointer'
-      : 'bg-slate-300 cursor-not-allowed'
-  }`}
->
-  {isSubmitting ? (
-    <>
-      <Loader2 className="w-8 h-8 animate-spin" />
-      <span>送信中...</span>
-      <span className="text-sm font-normal opacity-90">しばらくお待ちください</span>
-    </>
-  ) : (
-    <>
-      <Mail className="w-8 h-8" />
-      <span>銀行振込で申し込む</span>
-      <span className="text-sm font-normal opacity-90">振込先をメールでご案内</span>
-    </>
-  )}
-</button>
-  </div>
+  <button
+    onClick={() => handleStepChange(5)}
+    disabled={!agreedToTerms || rec.boxes.some((box, idx) => !validateSelection(idx).isValid)}
+    className={`w-full px-8 py-5 text-white text-xl font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-3 ${
+      agreedToTerms && rec.boxes.every((box, idx) => validateSelection(idx).isValid)
+        ? 'bg-orange-500 hover:bg-orange-600 transform hover:scale-[1.02] cursor-pointer'
+        : 'bg-slate-300 cursor-not-allowed'
+    }`}
+  >
+    <ArrowRight className="w-6 h-6" />
+    申し込み手続きへ進む
+  </button>
 </div>
-        
-        {copied && (
-          <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
-            <p className="text-green-800 font-medium">✓ 送信しました！</p>
-            <p className="text-sm text-green-700 mt-1">お申し込みを受け付けました。ご登録いただいたメールアドレスに確認のご連絡をさせていただきます。</p>
-          </div>
-        )}
         
         <button onClick={() => handleStepChange(1)} className="w-full px-8 py-4 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-all">
           最初に戻る
