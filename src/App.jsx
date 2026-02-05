@@ -655,7 +655,7 @@ const selectedFoods = rec.boxes.map((box, idx) => {
 
     const formDataToSubmit = new FormData();
     formDataToSubmit.append('name', formData.name);
-    formDataToSubmit.append('email', formData.email);
+    formDataToSubmit.append('email', user?.email || formData.email);
     formDataToSubmit.append('phone', formData.phone);
     formDataToSubmit.append('disasterType', rec.disasterType.type);
     formDataToSubmit.append('livingEnvironment', formData.livingEnvironment);
@@ -691,7 +691,7 @@ const selectedFoods = rec.boxes.map((box, idx) => {
     setIsSubmitting(false);  // ← これを追加！
   }
 };
-  const rec = diagnosisResult || (step === 4 ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 });
+ const rec = diagnosisResult || ((step === 4 || step === 5) ? generateRecommendations() : { boxes: [], initialCost: 9980, annualCost: 6000, disasterType: {}, personCount: 1 });
 
 if (showPolicy) {
   return <PolicyPage onBack={() => setShowPolicy(null)} defaultTab={showPolicy} />;
@@ -1600,6 +1600,275 @@ if (step === 'business') {
     </div>
   </div>
 )}
+
+{step === 5 && (
+
+  <div className="min-h-screen py-12 px-4 sm:px-6">
+    {console.log('★STEP 5 に来た！', { step, rec, personCount })}
+    <div className="max-w-2xl mx-auto">
+      {/* ヘッダー */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full mb-4">
+          <MapPin className="w-8 h-8 text-white" />
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
+          お届け先情報の入力
+        </h2>
+        <p className="text-slate-600">最後に配送先をご入力ください</p>
+      </div>
+
+      {/* 注文サマリー */}
+      <div className="bg-orange-50 rounded-xl p-4 mb-6 border border-orange-200">
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-slate-700">ご注文内容</span>
+          <span className="font-bold text-orange-600">
+            {rec.personCount}人分の護己セット
+          </span>
+        </div>
+        <div className="flex justify-between items-center mt-2">
+          <span className="text-sm text-slate-600">合計（初年度）</span>
+          <span className="font-bold text-lg text-slate-800">
+            ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0) + rec.annualCost).toLocaleString()}
+          </span>
+        </div>
+      </div>
+
+      {/* 入力フォーム */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-6">
+        {/* お名前 */}
+        <div>
+          <label className="block text-base font-semibold text-slate-700 mb-3">
+            お名前 <span className="text-orange-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none"
+            placeholder="山田 太郎"
+          />
+        </div>
+
+        {/* メールアドレス（ログイン済みなら表示のみ） */}
+        <div>
+          <label className="block text-base font-semibold text-slate-700 mb-3">
+            メールアドレス
+          </label>
+          <div className="w-full px-4 py-3 text-base bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-600">
+            {user?.email || formData.email}
+          </div>
+          <p className="text-xs text-slate-500 mt-1">※ログイン中のメールアドレスに確認メールをお送りします</p>
+        </div>
+
+        {/* 電話番号 */}
+        <div>
+          <label className="block text-base font-semibold text-slate-700 mb-3">
+            電話番号 <span className="text-orange-500">*</span>
+          </label>
+          <input
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+            className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none"
+            placeholder="090-1234-5678"
+          />
+        </div>
+
+        {/* 配送先住所 */}
+        <div className="border-t-2 border-slate-100 pt-6">
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin className="w-5 h-5 text-orange-500" />
+            <h3 className="text-lg font-bold text-slate-800">配送先住所</h3>
+          </div>
+
+          <div className="space-y-4">
+            {/* 郵便番号 */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                郵便番号 <span className="text-orange-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.shippingAddress.postalCode}
+                onChange={(e) => setFormData({
+                  ...formData, 
+                  shippingAddress: {...formData.shippingAddress, postalCode: e.target.value}
+                })}
+                className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                placeholder="123-4567"
+              />
+            </div>
+
+            {/* 都道府県・市区町村 */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  都道府県 <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.shippingAddress.prefecture}
+                  onChange={(e) => setFormData({
+                    ...formData, 
+                    shippingAddress: {...formData.shippingAddress, prefecture: e.target.value}
+                  })}
+                  className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                  placeholder="東京都"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  市区町村 <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.shippingAddress.city}
+                  onChange={(e) => setFormData({
+                    ...formData, 
+                    shippingAddress: {...formData.shippingAddress, city: e.target.value}
+                  })}
+                  className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                  placeholder="渋谷区"
+                />
+              </div>
+            </div>
+
+            {/* 番地 */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                番地 <span className="text-orange-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.shippingAddress.address}
+                onChange={(e) => setFormData({
+                  ...formData, 
+                  shippingAddress: {...formData.shippingAddress, address: e.target.value}
+                })}
+                className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                placeholder="1-2-3"
+              />
+            </div>
+
+            {/* 建物名 */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                建物名・部屋番号
+              </label>
+              <input
+                type="text"
+                value={formData.shippingAddress.building}
+                onChange={(e) => setFormData({
+                  ...formData, 
+                  shippingAddress: {...formData.shippingAddress, building: e.target.value}
+                })}
+                className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                placeholder="〇〇マンション101号室（任意）"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 支払い方法選択 */}
+      <div className="mt-8 space-y-4">
+        <p className="text-center text-lg font-bold text-slate-800">
+          お支払い方法を選択してください
+        </p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* クレジットカード */}
+          <button
+            onClick={() => submitToGoogleForm('card')}
+            disabled={
+              !formData.name || 
+              !formData.phone || 
+              !formData.shippingAddress.postalCode ||
+              !formData.shippingAddress.prefecture ||
+              !formData.shippingAddress.city ||
+              !formData.shippingAddress.address ||
+              isSubmitting
+            }
+            className={`px-6 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-2 ${
+              formData.name && formData.phone && formData.shippingAddress.postalCode && formData.shippingAddress.prefecture && formData.shippingAddress.city && formData.shippingAddress.address && !isSubmitting
+                ? 'bg-orange-500 hover:bg-orange-600 cursor-pointer'
+                : 'bg-slate-300 cursor-not-allowed'
+            }`}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <span>送信中...</span>
+              </>
+            ) : (
+              <>
+                <CreditCard className="w-6 h-6" />
+                <span>クレジットカード決済</span>
+                <span className="text-xs font-normal opacity-90">即時決済・すぐに発送手配</span>
+              </>
+            )}
+          </button>
+
+          {/* 銀行振込 */}
+          <button
+            onClick={() => submitToGoogleForm('bank')}
+            disabled={
+              !formData.name || 
+              !formData.phone || 
+              !formData.shippingAddress.postalCode ||
+              !formData.shippingAddress.prefecture ||
+              !formData.shippingAddress.city ||
+              !formData.shippingAddress.address ||
+              isSubmitting
+            }
+            className={`px-6 py-5 text-white text-lg font-bold rounded-xl transition-all shadow-lg flex flex-col items-center gap-2 ${
+              formData.name && formData.phone && formData.shippingAddress.postalCode && formData.shippingAddress.prefecture && formData.shippingAddress.city && formData.shippingAddress.address && !isSubmitting
+                ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
+                : 'bg-slate-300 cursor-not-allowed'
+            }`}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <span>送信中...</span>
+              </>
+            ) : (
+              <>
+                <Mail className="w-6 h-6" />
+                <span>銀行振込</span>
+                <span className="text-xs font-normal opacity-90">振込先をメールでご案内</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* 入力不足の警告 */}
+        {(!formData.name || !formData.phone || !formData.shippingAddress.postalCode || !formData.shippingAddress.prefecture || !formData.shippingAddress.city || !formData.shippingAddress.address) && (
+          <p className="text-center text-sm text-red-500">
+            ※必須項目をすべて入力してください
+          </p>
+        )}
+
+        {/* 送信完了メッセージ */}
+        {copied && (
+          <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
+            <p className="text-green-800 font-medium">✓ 送信しました！</p>
+            <p className="text-sm text-green-700 mt-1">確認メールをお送りしましたのでご確認ください。</p>
+          </div>
+        )}
+
+        {/* 戻るボタン */}
+        <button
+          onClick={() => handleStepChange(4)}
+          className="w-full px-6 py-3 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-all"
+        >
+          ← 食品選択に戻る
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
 
       {/* フッター */}
