@@ -119,100 +119,165 @@ const ShukiApp = () => {
       return { type: 'グルメな備蓄家タイプ', icon: '🍱', advice: 'あなたは「日常の延長」として防災を考えられる方。美味しさを妥協せず、ローリングストックで無理なく続けられる構成が最適です。' };
     }
   };
-
+// ★新規追加: step3プレビュー用のパーソナライズポイント生成
+  const generatePreviewPersonalizations = () => {
+    const personCount = getPersonCount();
+    const previewPoints = [];
+    
+    for (let i = 0; i < personCount; i++) {
+      const person = formData.persons[i];
+      const allergyList = person.allergies.filter(a => a !== '特になし');
+      
+      const points = [];
+      
+      // 味の好み
+      if (person.tastePreference && person.tastePreference2) {
+        points.push({
+          title: `${person.tastePreference}×${person.tastePreference2}`,
+          detail: 'お好みに合わせた食品を厳選'
+        });
+      }
+      
+      // アレルギー対応
+      if (allergyList.length > 0) {
+        points.push({
+          title: `${allergyList.join('・')}アレルギー対応`,
+          detail: 'アレルゲンを含まない食品のみを選定'
+        });
+      }
+      
+      // 食の好み
+      if (person.foodPreference && person.foodPreference !== 'こだわりなし') {
+        points.push({
+          title: `${person.foodPreference}に特化`,
+          detail: 'お好みの主食を中心に構成'
+        });
+      }
+      
+      // 性別対応
+      if (person.gender === '女性') {
+        points.push({
+          title: '女性向け衛生用品付き',
+          detail: '生理用品・衛生セットを追加'
+        });
+      }
+      
+      previewPoints.push({
+        personLabel: personCount === 1 ? '' : `${i + 1}人目`,
+        points
+      });
+    }
+    
+    return previewPoints;
+  };
   const generateRecommendations = () => {
     const personCount = getPersonCount();
     
-    // 完全な商品データベース
+  
+// ★修正版: 統一された商品データベース
     const foodDatabase = {
-      'さばの味噌煮': { category: 'おかず', price: 440, allergens: ['小麦', 'さば', '大豆'], icon: '🐟' },
-      'いわしの煮付': { category: 'おかず', price: 440, allergens: ['小麦', '大豆'], icon: '🐟' },
-      '赤魚の煮付': { category: 'おかず', price: 480, allergens: ['小麦', '大豆'], icon: '🐟' },
-      'ハンバーグ煮込み': { category: 'おかず', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
-      'ハンバーグ煮込みトマトソース': { category: 'おかず', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
-      '中華風ミートボール': { category: 'おかず', price: 440, allergens: ['小麦', '卵', '乳製品'], icon: '🥢' },
-      '肉じゃが': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥔' },
-      '筑前煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥕' },
-      '豚汁': { category: 'おかず', price: 420, allergens: [], icon: '🍲' },
-      'きんぴらごぼう': { category: 'おかず', price: 400, allergens: ['小麦'], icon: '🥕' },
-      '鶏と野菜のトマト煮': { category: 'おかず', price: 480, allergens: ['小麦', '乳製品'], icon: '🍗' },
-      '根菜のやわらか煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥕' },
-      '里芋の鶏そぼろ煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🍲' },
-      'おでん': { category: 'おかず', price: 450, allergens: ['小麦'], icon: '🍢' },
-      'けんちん汁': { category: 'おかず', price: 420, allergens: [], icon: '🍲' },
-      '牛丼の具': { category: '主食', price: 550, allergens: ['小麦'], icon: '🍖' },
-      'ポークカレー': { category: '主食', price: 480, allergens: ['小麦', '乳製品'], icon: '🍛' },
-      '鮭粥': { category: '主食', price: 350, allergens: [], icon: '🍚' },
-      '白粥': { category: '主食', price: 280, allergens: [], icon: '🍚' },
-      '梅粥': { category: '主食', price: 280, allergens: [], icon: '🍚' },
-      '塩ラーメン味': { category: '麺類', price: 580, allergens: ['小麦', '卵'], icon: '🍜' },
-      'しょうゆラーメン味': { category: '麺類', price: 580, allergens: ['小麦', '卵'], icon: '🍜' },
-      'うどん味': { category: '麺類', price: 580, allergens: ['小麦'], icon: '🍜' },
-      'カルボナーラ': { category: '麺類', price: 450, allergens: ['小麦', '乳製品'], icon: '🍝' },
-      'ペペロンチーノ': { category: '麺類', price: 450, allergens: [], icon: '🍝' },
-      'きのこのパスタ': { category: '麺類', price: 450, allergens: ['小麦', '乳製品'], icon: '🍝' },
-      '米粉でつくった山菜うどん': { category: '麺類', price: 450, allergens: [], icon: '🍜', allergenFree: true },
-      '米粉でつくったカレーうどん': { category: '麺類', price: 450, allergens: [], icon: '🍜', allergenFree: true },
-      'あじのムース（にんじん付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🐟' },
-      'いかのムース（ごぼう付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🦑' },
-      '牛肉のムース（すき焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
-      '豚肉のムース（しょうが焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖' },
-      'スティックバウムクーヘン（プレーン）': { category: 'パン・甘味', price: 350, allergens: ['小麦', '卵', '乳成分', '大豆'], icon: '🍰' },
-      'スティックバウムクーヘン（ココア）': { category: 'パン・甘味', price: 350, allergens: ['小麦', '卵', '乳成分', '大豆'], icon: '🍰' },
-      'パンですよ!5年保存 チョコチップ味': { category: 'パン・甘味', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞' },
-      'パンですよ!5年保存 レーズン味': { category: 'パン・甘味', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞' },
-      'パンですよ!5年保存 コーヒーナッツ味': { category: 'パン・甘味', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞' },
-      'さつま芋のレモン煮': { category: '副菜', price: 400, allergens: [], icon: '🍠' },
-      'ソフト金時豆': { category: '副菜', price: 380, allergens: [], icon: '🫘' },
-      'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420, allergens: [], icon: '🎃', allergenFree: true },
-      '尾西の五目ごはん': { category: '主食', price: 380, allergens: ['大豆', '小麦'], icon: '🍚' },
-      '尾西の松茸ごはん': { category: '主食', price: 480, allergens: ['乳製品', '大豆', '小麦'], icon: '🍚' },
-      '尾西のチキンライス': { category: '主食', price: 420, allergens: ['豚肉', '大豆', '鶏肉', '小麦'], icon: '🍚' },
-      '尾西のえびピラフ': { category: '主食', price: 420, allergens: ['乳製品', 'かに', 'えび', '豚肉', '鶏肉', '小麦'], icon: '🍚' },
-      '尾西の白飯': { category: '主食', price: 300, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西の赤飯': { category: '主食', price: 380, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のわかめごはん': { category: '主食', price: 380, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のきのこごはん': { category: '主食', price: 380, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西の山菜おこわ': { category: '主食', price: 380, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のたけのこごはん': { category: '主食', price: 480, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のアレルギー対応五目ごはん': { category: '主食', price: 400, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のドライカレー': { category: '主食', price: 420, allergens: [], icon: '🍛', allergenFree: true },
-      '白がゆ': { category: '主食', price: 280, allergens: [], icon: '🍚', allergenFree: true },
-      '梅がゆ': { category: '主食', price: 300, allergens: [], icon: '🍚', allergenFree: true },
-      '塩こんぶがゆ': { category: '主食', price: 320, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のレンジ＋（プラス）五目ごはん': { category: '主食', price: 450, allergens: ['大豆', '小麦'], icon: '🍚' },
-      '尾西のレンジ＋（プラス）チキンライス': { category: '主食', price: 450, allergens: ['豚肉', '大豆', '鶏肉', '小麦'], icon: '🍚' },
-      '尾西のレンジ＋（プラス）赤飯': { category: '主食', price: 450, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のレンジ＋（プラス）きのこごはん': { category: '主食', price: 450, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のレンジ＋（プラス）山菜おこわ': { category: '主食', price: 450, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のレンジ＋（プラス）たけのこごはん': { category: '主食', price: 480, allergens: [], icon: '🍚', allergenFree: true },
-      '尾西のレンジ＋（プラス）ドライカレー': { category: '主食', price: 450, allergens: [], icon: '🍛', allergenFree: true },
-      '携帯おにぎり 鮭': { category: '主食', price: 250, allergens: [], icon: '🍙', allergenFree: true },
-      '携帯おにぎり わかめ': { category: '主食', price: 250, allergens: [], icon: '🍙', allergenFree: true },
-      '携帯おにぎり 五目おこわ': { category: '主食', price: 250, allergens: [], icon: '🍙', allergenFree: true },
-      '携帯おにぎり 昆布': { category: '主食', price: 250, allergens: [], icon: '🍙', allergenFree: true },
-      '米粉でつくった山菜うどん': { category: '麺類', price: 500, allergens: [], icon: '🍜', allergenFree: true },
-      '米粉でつくったカレーうどん': { category: '麺類', price: 550, allergens: [], icon: '🍜', allergenFree: true },
-      '佐竹 白飯': { category: '主食', price: 330, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 五目ご飯': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 わかめご飯': { category: '主食', price: 390, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 青菜ご飯': { category: '主食', price: 390, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 梅昆布ご飯': { category: '主食', price: 440, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 鯛めし': { category: '主食', price: 440, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 梅じゃこご飯': { category: '主食', price: 390, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 根菜ご飯': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 ドライカレー': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍛' },
-      '佐竹 野菜ピラフ': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 チャーハン': { category: '主食', price: 420, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 白がゆ': { category: '主食', price: 310, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 梅がゆ': { category: '主食', price: 340, allergens: ['小麦'], icon: '🍚' },
-      '佐竹 青菜がゆ': { category: '主食', price: 340, allergens: ['小麦'], icon: '🍚' },
-      'カルボナーラ': { category: '麺類', price: 430, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍝' },
-      'ペペロンチーノ': { category: '麺類', price: 400, allergens: ['小麦'], icon: '🍝' },
-      'きのこのパスタ': { category: '麺類', price: 400, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍝' },
-      '醤油だし風味ラーメン': { category: '麺類', price: 300, allergens: ['さば', '大豆', '鶏肉', '小麦'], icon: '🍜' },
-      'チゲ風味ラーメン': { category: '麺類', price: 360, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍜' },
-      'シーフード風味ラーメン': { category: '麺類', price: 360, allergens: ['小麦', '乳製品', 'えび', 'かに', 'さば', '大豆', '鶏肉', '豚肉'], icon: '🍜' }
+      // === 主食（ごはん系・尾西） ===
+      '尾西の五目ごはん': { category: '主食', subType: 'ごはん', price: 380, allergens: ['大豆', '小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '尾西の松茸ごはん': { category: '主食', subType: 'ごはん', price: 480, allergens: ['乳製品', '大豆', '小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '尾西のチキンライス': { category: '主食', subType: 'ごはん', price: 420, allergens: ['豚肉', '大豆', '鶏肉', '小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '尾西のえびピラフ': { category: '主食', subType: 'ごはん', price: 420, allergens: ['乳製品', 'かに', 'えび', '豚肉', '鶏肉', '小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '尾西の白飯': { category: '主食', subType: 'ごはん', price: 300, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '尾西の赤飯': { category: '主食', subType: 'ごはん', price: 380, allergens: [], icon: '🍚', taste: [], allergenFree: true },
+      '尾西のわかめごはん': { category: '主食', subType: 'ごはん', price: 380, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '尾西のきのこごはん': { category: '主食', subType: 'ごはん', price: 380, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '尾西の山菜おこわ': { category: '主食', subType: 'ごはん', price: 380, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '尾西のたけのこごはん': { category: '主食', subType: 'ごはん', price: 480, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '尾西のアレルギー対応五目ごはん': { category: '主食', subType: 'ごはん', price: 400, allergens: [], icon: '🍚', taste: [], allergenFree: true },
+      '尾西のドライカレー': { category: '主食', subType: 'ごはん', price: 420, allergens: [], icon: '🍛', taste: ['辛いもの好き', '味濃いめが好き'], allergenFree: true },
+
+      // === 主食（ごはん系・尾西レンジ＋） ===
+      '尾西のレンジ＋五目ごはん': { category: '主食', subType: 'ごはん', price: 450, allergens: ['大豆', '小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '尾西のレンジ＋チキンライス': { category: '主食', subType: 'ごはん', price: 450, allergens: ['豚肉', '大豆', '鶏肉', '小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '尾西のレンジ＋赤飯': { category: '主食', subType: 'ごはん', price: 450, allergens: [], icon: '🍚', taste: [], allergenFree: true },
+      '尾西のレンジ＋きのこごはん': { category: '主食', subType: 'ごはん', price: 450, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '尾西のレンジ＋山菜おこわ': { category: '主食', subType: 'ごはん', price: 450, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '尾西のレンジ＋たけのこごはん': { category: '主食', subType: 'ごはん', price: 480, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '尾西のレンジ＋ドライカレー': { category: '主食', subType: 'ごはん', price: 450, allergens: [], icon: '🍛', taste: ['辛いもの好き', '味濃いめが好き'], allergenFree: true },
+
+      // === 主食（携帯おにぎり） ===
+      '携帯おにぎり 鮭': { category: '主食', subType: 'ごはん', price: 250, allergens: [], icon: '🍙', taste: ['あっさりが好き'], allergenFree: true },
+      '携帯おにぎり わかめ': { category: '主食', subType: 'ごはん', price: 250, allergens: [], icon: '🍙', taste: ['あっさりが好き'], allergenFree: true },
+      '携帯おにぎり 五目おこわ': { category: '主食', subType: 'ごはん', price: 250, allergens: [], icon: '🍙', taste: ['味濃いめが好き'], allergenFree: true },
+      '携帯おにぎり 昆布': { category: '主食', subType: 'ごはん', price: 250, allergens: [], icon: '🍙', taste: ['あっさりが好き'], allergenFree: true },
+
+      // === 主食（ごはん系・佐竹） ===
+      '佐竹 白飯': { category: '主食', subType: 'ごはん', price: 330, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+      '佐竹 五目ご飯': { category: '主食', subType: 'ごはん', price: 420, allergens: ['小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '佐竹 わかめご飯': { category: '主食', subType: 'ごはん', price: 390, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+      '佐竹 青菜ご飯': { category: '主食', subType: 'ごはん', price: 390, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+      '佐竹 梅昆布ご飯': { category: '主食', subType: 'ごはん', price: 440, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+      '佐竹 鯛めし': { category: '主食', subType: 'ごはん', price: 440, allergens: ['小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '佐竹 梅じゃこご飯': { category: '主食', subType: 'ごはん', price: 390, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+      '佐竹 根菜ご飯': { category: '主食', subType: 'ごはん', price: 420, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+      '佐竹 ドライカレー': { category: '主食', subType: 'ごはん', price: 420, allergens: ['小麦'], icon: '🍛', taste: ['辛いもの好き', '味濃いめが好き'] },
+      '佐竹 野菜ピラフ': { category: '主食', subType: 'ごはん', price: 420, allergens: ['小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+      '佐竹 チャーハン': { category: '主食', subType: 'ごはん', price: 420, allergens: ['小麦'], icon: '🍚', taste: ['味濃いめが好き'] },
+
+      // === 主食（粥系） ===
+      '白がゆ': { category: '主食', subType: 'お粥', price: 280, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '梅がゆ': { category: '主食', subType: 'お粥', price: 300, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '塩こんぶがゆ': { category: '主食', subType: 'お粥', price: 320, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '鮭粥': { category: '主食', subType: 'お粥', price: 350, allergens: [], icon: '🍚', taste: ['あっさりが好き'], allergenFree: true },
+      '佐竹 白がゆ': { category: '主食', subType: 'お粥', price: 310, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+      '佐竹 梅がゆ': { category: '主食', subType: 'お粥', price: 340, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+      '佐竹 青菜がゆ': { category: '主食', subType: 'お粥', price: 340, allergens: ['小麦'], icon: '🍚', taste: ['あっさりが好き'] },
+
+      // === 主食（麺類） ===
+      '塩ラーメン味': { category: '主食', subType: '麺', price: 580, allergens: ['小麦', '卵'], icon: '🍜', taste: ['あっさりが好き'] },
+      'しょうゆラーメン味': { category: '主食', subType: '麺', price: 580, allergens: ['小麦', '卵'], icon: '🍜', taste: ['味濃いめが好き'] },
+      'うどん味': { category: '主食', subType: '麺', price: 580, allergens: ['小麦'], icon: '🍜', taste: ['あっさりが好き'] },
+      'カルボナーラ': { category: '主食', subType: '麺', price: 430, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍝', taste: ['味濃いめが好き'] },
+      'ペペロンチーノ': { category: '主食', subType: '麺', price: 400, allergens: ['小麦'], icon: '🍝', taste: ['辛いもの好き'] },
+      'きのこのパスタ': { category: '主食', subType: '麺', price: 400, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍝', taste: ['あっさりが好き'] },
+      '米粉でつくった山菜うどん': { category: '主食', subType: '麺', price: 500, allergens: [], icon: '🍜', taste: ['あっさりが好き'], allergenFree: true },
+      '米粉でつくったカレーうどん': { category: '主食', subType: '麺', price: 550, allergens: [], icon: '🍜', taste: ['辛いもの好き', '味濃いめが好き'], allergenFree: true },
+      '醤油だし風味ラーメン': { category: '主食', subType: '麺', price: 300, allergens: ['さば', '大豆', '鶏肉', '小麦'], icon: '🍜', taste: ['味濃いめが好き'] },
+      'チゲ風味ラーメン': { category: '主食', subType: '麺', price: 360, allergens: ['小麦', '乳製品', '大豆', '鶏肉', '豚肉'], icon: '🍜', taste: ['辛いもの好き'] },
+      'シーフード風味ラーメン': { category: '主食', subType: '麺', price: 360, allergens: ['小麦', '乳製品', 'えび', 'かに', 'さば', '大豆', '鶏肉', '豚肉'], icon: '🍜', taste: ['味濃いめが好き'] },
+
+      // === 主食（パン系） ===
+      'パンですよ!5年保存 チョコチップ味': { category: '主食', subType: 'パン', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞', taste: ['甘いもの好き'] },
+      'パンですよ!5年保存 レーズン味': { category: '主食', subType: 'パン', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞', taste: ['甘いもの好き'] },
+      'パンですよ!5年保存 コーヒーナッツ味': { category: '主食', subType: 'パン', price: 500, allergens: ['小麦', '卵', '乳成分'], icon: '🍞', taste: ['甘いもの好き'] },
+
+      // === おかず ===
+      '牛丼の具': { category: 'おかず', price: 550, allergens: ['小麦'], icon: '🍖', taste: ['味濃いめが好き'] },
+      'ポークカレー': { category: 'おかず', price: 480, allergens: ['小麦', '乳製品'], icon: '🍛', taste: ['辛いもの好き', '味濃いめが好き'] },
+      'さばの味噌煮': { category: 'おかず', price: 440, allergens: ['小麦', 'さば', '大豆'], icon: '🐟', taste: ['味濃いめが好き'] },
+      'いわしの煮付': { category: 'おかず', price: 440, allergens: ['小麦', '大豆'], icon: '🐟', taste: ['あっさりが好き'] },
+      '赤魚の煮付': { category: 'おかず', price: 480, allergens: ['小麦', '大豆'], icon: '🐟', taste: ['あっさりが好き'] },
+      'ハンバーグ煮込み': { category: 'おかず', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖', taste: ['味濃いめが好き'] },
+      'ハンバーグ煮込みトマトソース': { category: 'おかず', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖', taste: ['味濃いめが好き', '辛いもの好き'] },
+      '中華風ミートボール': { category: 'おかず', price: 440, allergens: ['小麦', '卵', '乳製品'], icon: '🥢', taste: ['味濃いめが好き'] },
+      '肉じゃが': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥔', taste: ['味濃いめが好き'] },
+      '筑前煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥕', taste: ['あっさりが好き'] },
+      '豚汁': { category: 'おかず', price: 420, allergens: [], icon: '🍲', taste: ['あっさりが好き'], allergenFree: true },
+      'きんぴらごぼう': { category: 'おかず', price: 400, allergens: ['小麦'], icon: '🥕', taste: ['味濃いめが好き'] },
+      '鶏と野菜のトマト煮': { category: 'おかず', price: 480, allergens: ['小麦', '乳製品'], icon: '🍗', taste: ['味濃いめが好き'] },
+      '根菜のやわらか煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🥕', taste: ['あっさりが好き'] },
+      '里芋の鶏そぼろ煮': { category: 'おかず', price: 430, allergens: ['小麦'], icon: '🍲', taste: ['あっさりが好き'] },
+      'おでん': { category: 'おかず', price: 450, allergens: ['小麦'], icon: '🍢', taste: ['あっさりが好き'] },
+      'けんちん汁': { category: 'おかず', price: 420, allergens: [], icon: '🍲', taste: ['あっさりが好き'], allergenFree: true },
+
+      // === ムース（介護食） ===
+      'あじのムース（にんじん付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🐟', taste: ['あっさりが好き'] },
+      'いかのムース（ごぼう付）': { category: 'ムース', price: 450, allergens: ['小麦', '卵'], icon: '🦑', taste: ['あっさりが好き'] },
+      '牛肉のムース（すき焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖', taste: ['味濃いめが好き'] },
+      '豚肉のムース（しょうが焼き風）': { category: 'ムース', price: 480, allergens: ['小麦', '卵', '乳製品'], icon: '🍖', taste: ['味濃いめが好き'] },
+
+      // === 甘味 ===
+      'スティックバウムクーヘン（プレーン）': { category: '甘味', price: 350, allergens: ['小麦', '卵', '乳成分', '大豆'], icon: '🍰', taste: ['甘いもの好き'] },
+      'スティックバウムクーヘン（ココア）': { category: '甘味', price: 350, allergens: ['小麦', '卵', '乳成分', '大豆'], icon: '🍰', taste: ['甘いもの好き'] },
+
+      // === 副菜 ===
+      'さつま芋のレモン煮': { category: '副菜', price: 400, allergens: [], icon: '🍠', taste: ['甘いもの好き'], allergenFree: true },
+      'ソフト金時豆': { category: '副菜', price: 380, allergens: [], icon: '🫘', taste: ['甘いもの好き'], allergenFree: true },
+      'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420, allergens: [], icon: '🎃', taste: ['甘いもの好き'], allergenFree: true },
     };
 
     // 最安基本セット
@@ -248,64 +313,140 @@ const ShukiApp = () => {
   '甘いもの好き': ['さつま芋のレモン煮', 'スティックバウムクーヘン（プレーン）', 'スティックバウムクーヘン（ココア）', 'ソフト金時豆']
 };
       
-     // ★10品推奨ロジック（修正版）
+  // ★修正: 10品推奨ロジック（ランダム選択 + 主食4品以上保証）
       let recommendedFoods = [];
       let personalizations = [];
       
-      // 食の好みによる優先商品選定
-      if (person.foodPreference === '麺派') {
-        const noodleItems = Object.keys(foodDatabase).filter(name => 
-          foodDatabase[name].category === '麺類' && canEat(name)
-        );
-        recommendedFoods = [...noodleItems.slice(0, 6)]; // 麺類から6品
-        personalizations.push({ 
-          reason: `麺派に特化した選定`, 
-          detail: 'アレルギー対応の麺類を中心に、バラエティ豊かな麺料理を選定' 
-        });
+      // シャッフル関数
+      const shuffleArray = (array) => {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      };
+      
+      // 味の好みに合う商品をフィルタする関数
+      const matchesTaste = (foodName, taste1, taste2) => {
+        const food = foodDatabase[foodName];
+        if (!food || !food.taste) return false;
+        return food.taste.includes(taste1) || (taste2 && food.taste.includes(taste2));
+      };
+      
+      // ★STEP1: 食の好みに応じた主食を選択
+      const allMainDishes = Object.keys(foodDatabase).filter(name => 
+        foodDatabase[name].category === '主食' && canEat(name)
+      );
+      
+      let targetSubType = null;
+      if (person.foodPreference === 'ご飯派') {
+        targetSubType = 'ごはん';
+        personalizations.push({ reason: 'ご飯派に特化', detail: 'しっかりしたご飯系を中心に選定' });
+      } else if (person.foodPreference === '麺派') {
+        targetSubType = '麺';
+        personalizations.push({ reason: '麺派に特化', detail: 'バラエティ豊かな麺類を中心に選定' });
       } else if (person.foodPreference === 'パン派') {
-        const breadItems = Object.keys(foodDatabase).filter(name => 
-          foodDatabase[name].category === 'パン・甘味' && canEat(name)
-        );
-        recommendedFoods = [...breadItems.slice(0, 4)]; // パン系から4品
-        personalizations.push({ 
-          reason: `パン派に特化した選定`, 
-          detail: '5年保存可能なパンを中心に選定' 
-        });
-      } else {
-        // 主食優先
-        const mainDishes = Object.keys(foodDatabase).filter(name => 
-          foodDatabase[name].category === '主食' && canEat(name)
-        );
-        recommendedFoods = [...mainDishes.slice(0, 5)]; // 主食から5品
+        targetSubType = 'パン';
+        personalizations.push({ reason: 'パン派に特化', detail: '5年保存可能なパンを中心に選定' });
       }
       
-      // 残りを味の好みから追加
-      const pref1Foods = tasteGroups[person.tastePreference] || [];
-      const pref2Foods = person.tastePreference2 ? (tasteGroups[person.tastePreference2] || []) : [];
-      const availablePref1 = pref1Foods.filter(canEat).filter(f => !recommendedFoods.includes(f));
-      const availablePref2 = pref2Foods.filter(canEat).filter(f => !recommendedFoods.includes(f) && !availablePref1.includes(f));
+      // 食の好み + 味の好みでフィルタ
+      let preferredMainDishes = [];
+      let otherMainDishes = [];
       
-      recommendedFoods = [
-        ...recommendedFoods,
-        ...availablePref1.slice(0, 3),
-        ...availablePref2.slice(0, 2)
-      ];
+      if (targetSubType) {
+        // 食の好みに合うsubTypeの主食
+        const subTypeMatched = allMainDishes.filter(name => 
+          foodDatabase[name].subType === targetSubType
+        );
+        // その中で味の好みに合うもの
+        const tastAndSubTypeMatched = subTypeMatched.filter(name => 
+          matchesTaste(name, person.tastePreference, person.tastePreference2)
+        );
+        // 味は合わないけどsubTypeは合うもの
+        const subTypeOnlyMatched = subTypeMatched.filter(name => 
+          !tastAndSubTypeMatched.includes(name)
+        );
+        
+        preferredMainDishes = shuffleArray(tastAndSubTypeMatched);
+        otherMainDishes = shuffleArray(subTypeOnlyMatched);
+        
+        // パン派・麺派はお粥を除外したごはんも追加候補に
+        if (targetSubType === '麺' || targetSubType === 'パン') {
+          const riceOptions = allMainDishes.filter(name => 
+            foodDatabase[name].subType === 'ごはん' && 
+            matchesTaste(name, person.tastePreference, person.tastePreference2)
+          );
+          otherMainDishes = [...otherMainDishes, ...shuffleArray(riceOptions)];
+        }
+      } else {
+        // こだわりなし：お粥以外のごはん系を優先、味の好みでフィルタ
+        const nonPorridgeRice = allMainDishes.filter(name => 
+          foodDatabase[name].subType === 'ごはん'
+        );
+        const tasteMatched = nonPorridgeRice.filter(name => 
+          matchesTaste(name, person.tastePreference, person.tastePreference2)
+        );
+        const tasteNotMatched = nonPorridgeRice.filter(name => 
+          !tasteMatched.includes(name)
+        );
+        
+        preferredMainDishes = shuffleArray(tasteMatched);
+        otherMainDishes = shuffleArray(tasteNotMatched);
+      }
+      
+      // 主食を4品選択（味の好み優先 + ランダム）
+      const selectedMainDishes = [
+        ...preferredMainDishes.slice(0, 4),
+        ...otherMainDishes.slice(0, 4 - Math.min(preferredMainDishes.length, 4))
+      ].slice(0, 4);
+      
+      recommendedFoods = [...selectedMainDishes];
+      
+      // ★STEP2: 味の好みに合うおかずを追加（ランダム）
+      const allSideDishes = Object.keys(foodDatabase).filter(name => 
+        (foodDatabase[name].category === 'おかず' || foodDatabase[name].category === '副菜') && 
+        canEat(name) && !recommendedFoods.includes(name)
+      );
+      
+      const tasteMatchedSides = allSideDishes.filter(name => 
+        matchesTaste(name, person.tastePreference, person.tastePreference2)
+      );
+      const otherSides = allSideDishes.filter(name => 
+        !tasteMatchedSides.includes(name)
+      );
+      
+      const shuffledSides = [...shuffleArray(tasteMatchedSides), ...shuffleArray(otherSides)];
+      recommendedFoods = [...recommendedFoods, ...shuffledSides.slice(0, 3)];
+      
+      // ★STEP3: 甘味好きなら甘味も追加
+      if (person.tastePreference === '甘いもの好き' || person.tastePreference2 === '甘いもの好き') {
+        const sweets = Object.keys(foodDatabase).filter(name => 
+          foodDatabase[name].category === '甘味' && canEat(name) && !recommendedFoods.includes(name)
+        );
+        recommendedFoods = [...recommendedFoods, ...shuffleArray(sweets).slice(0, 1)];
+      }
+      
+      // ★STEP4: 残りを補完（ランダム）
+      if (recommendedFoods.length < 10) {
+        const remaining = Object.keys(foodDatabase).filter(name => 
+          canEat(name) && !recommendedFoods.includes(name)
+        );
+        const shuffledRemaining = shuffleArray(remaining);
+        recommendedFoods = [...recommendedFoods, ...shuffledRemaining].slice(0, 10);
+      }
       
       // 10品に調整
-      if (recommendedFoods.length < 10) {
-        const allAvailable = Object.keys(foodDatabase).filter(canEat).filter(f => !recommendedFoods.includes(f));
-        recommendedFoods = [...recommendedFoods, ...allAvailable].slice(0, 10);
-      } else {
-        recommendedFoods = recommendedFoods.slice(0, 10);
-      }
+      recommendedFoods = recommendedFoods.slice(0, 10);
       
-      // パーソナライズ理由の追加（既存のコードを維持）
-     if (person.tastePreference && person.tastePreference2) {
-  personalizations.push({ 
-    reason: `${person.tastePreference}と${person.tastePreference2}をバランスよく`, 
-    detail: 'お好みに合わせてAIが10品を厳選 → そこから6品をお選びください' 
-  });
-}
+      // パーソナライズ理由の追加
+      if (person.tastePreference && person.tastePreference2) {
+        personalizations.push({ 
+          reason: `${person.tastePreference}×${person.tastePreference2}`, 
+          detail: 'お好みに合わせてAIが10品を厳選 → そこから6品をお選びください' 
+        });
+      }
       
       if (allergyList.length > 0) {
         personalizations.push({ 
@@ -313,6 +454,12 @@ const ShukiApp = () => {
           detail: 'アレルゲンを含まない食品のみを厳選' 
         });
       }
+      
+      // デバッグ
+      const finalMainDishCount = recommendedFoods.filter(name => 
+        foodDatabase[name]?.category === '主食'
+      ).length;
+      console.log(`Person ${i + 1}: 主食${finalMainDishCount}品 / 全${recommendedFoods.length}品`, recommendedFoods);
         
       // ベースアイテム
       const baseItems = [
@@ -400,26 +547,70 @@ const ShukiApp = () => {
   const validateSelection = (personIndex) => {
     const selected = userSelections[personIndex] || [];
     
-    // 商品データベース（generateRecommendationsと同じ定義を使用）
+    // ★修正版: generateRecommendationsと同じカテゴリ定義
     const foodDatabase = {
-      '牛丼の具': { category: '主食', price: 550 },
-      'ポークカレー': { category: '主食', price: 480 },
+      // === 主食（ごはん系） ===
+      '尾西の五目ごはん': { category: '主食', price: 380 },
+      '尾西の松茸ごはん': { category: '主食', price: 480 },
+      '尾西のチキンライス': { category: '主食', price: 420 },
+      '尾西のえびピラフ': { category: '主食', price: 420 },
+      '尾西の白飯': { category: '主食', price: 300 },
+      '尾西の赤飯': { category: '主食', price: 380 },
+      '尾西のわかめごはん': { category: '主食', price: 380 },
+      '尾西のきのこごはん': { category: '主食', price: 380 },
+      '尾西の山菜おこわ': { category: '主食', price: 380 },
+      '尾西のたけのこごはん': { category: '主食', price: 480 },
+      '尾西のアレルギー対応五目ごはん': { category: '主食', price: 400 },
+      '尾西のドライカレー': { category: '主食', price: 420 },
+      '尾西のレンジ＋五目ごはん': { category: '主食', price: 450 },
+      '尾西のレンジ＋チキンライス': { category: '主食', price: 450 },
+      '尾西のレンジ＋赤飯': { category: '主食', price: 450 },
+      '尾西のレンジ＋きのこごはん': { category: '主食', price: 450 },
+      '尾西のレンジ＋山菜おこわ': { category: '主食', price: 450 },
+      '尾西のレンジ＋たけのこごはん': { category: '主食', price: 480 },
+      '尾西のレンジ＋ドライカレー': { category: '主食', price: 450 },
+      '携帯おにぎり 鮭': { category: '主食', price: 250 },
+      '携帯おにぎり わかめ': { category: '主食', price: 250 },
+      '携帯おにぎり 五目おこわ': { category: '主食', price: 250 },
+      '携帯おにぎり 昆布': { category: '主食', price: 250 },
+      '佐竹 白飯': { category: '主食', price: 330 },
+      '佐竹 五目ご飯': { category: '主食', price: 420 },
+      '佐竹 わかめご飯': { category: '主食', price: 390 },
+      '佐竹 青菜ご飯': { category: '主食', price: 390 },
+      '佐竹 梅昆布ご飯': { category: '主食', price: 440 },
+      '佐竹 鯛めし': { category: '主食', price: 440 },
+      '佐竹 梅じゃこご飯': { category: '主食', price: 390 },
+      '佐竹 根菜ご飯': { category: '主食', price: 420 },
+      '佐竹 ドライカレー': { category: '主食', price: 420 },
+      '佐竹 野菜ピラフ': { category: '主食', price: 420 },
+      '佐竹 チャーハン': { category: '主食', price: 420 },
+      '佐竹 白がゆ': { category: '主食', price: 310 },
+      '佐竹 梅がゆ': { category: '主食', price: 340 },
+      '佐竹 青菜がゆ': { category: '主食', price: 340 },
+      // === 主食（粥系） ===
+      '白がゆ': { category: '主食', price: 280 },
+      '梅がゆ': { category: '主食', price: 300 },
+      '塩こんぶがゆ': { category: '主食', price: 320 },
       '鮭粥': { category: '主食', price: 350 },
-      '白粥': { category: '主食', price: 280 },
-      '梅粥': { category: '主食', price: 280 },
-      '塩ラーメン味': { category: '麺類', price: 580 },
-      'しょうゆラーメン味': { category: '麺類', price: 580 },
-      'うどん味': { category: '麺類', price: 580 },
-      'カルボナーラ': { category: '麺類', price: 450 },
-      'ペペロンチーノ': { category: '麺類', price: 450 },
-      'きのこのパスタ': { category: '麺類', price: 450 },
-      '米粉でつくった山菜うどん': { category: '麺類', price: 450, allergenFree: true },
-      '米粉でつくったカレーうどん': { category: '麺類', price: 450, allergenFree: true },
-      'パンですよ!5年保存 チョコチップ味': { category: 'パン・甘味', price: 500 },
-      'パンですよ!5年保存 レーズン味': { category: 'パン・甘味', price: 500 },
-      'パンですよ!5年保存 コーヒーナッツ味': { category: 'パン・甘味', price: 500 },
-      'スティックバウムクーヘン（プレーン）': { category: 'パン・甘味', price: 350 },
-      'スティックバウムクーヘン（ココア）': { category: 'パン・甘味', price: 350 },
+      // === 主食（麺類）★修正: 麺類も主食 ===
+      '塩ラーメン味': { category: '主食', price: 580 },
+      'しょうゆラーメン味': { category: '主食', price: 580 },
+      'うどん味': { category: '主食', price: 580 },
+      'カルボナーラ': { category: '主食', price: 430 },
+      'ペペロンチーノ': { category: '主食', price: 400 },
+      'きのこのパスタ': { category: '主食', price: 400 },
+      '米粉でつくった山菜うどん': { category: '主食', price: 500 },
+      '米粉でつくったカレーうどん': { category: '主食', price: 550 },
+      '醤油だし風味ラーメン': { category: '主食', price: 300 },
+      'チゲ風味ラーメン': { category: '主食', price: 360 },
+      'シーフード風味ラーメン': { category: '主食', price: 360 },
+      // === 主食（パン系）★修正: パンも主食 ===
+      'パンですよ!5年保存 チョコチップ味': { category: '主食', price: 500 },
+      'パンですよ!5年保存 レーズン味': { category: '主食', price: 500 },
+      'パンですよ!5年保存 コーヒーナッツ味': { category: '主食', price: 500 },
+      // === おかず ★修正: 牛丼・カレーはおかず ===
+      '牛丼の具': { category: 'おかず', price: 550 },
+      'ポークカレー': { category: 'おかず', price: 480 },
       'さばの味噌煮': { category: 'おかず', price: 440 },
       'いわしの煮付': { category: 'おかず', price: 440 },
       '赤魚の煮付': { category: 'おかず', price: 480 },
@@ -435,56 +626,18 @@ const ShukiApp = () => {
       '里芋の鶏そぼろ煮': { category: 'おかず', price: 430 },
       'おでん': { category: 'おかず', price: 450 },
       'けんちん汁': { category: 'おかず', price: 420 },
-      'さつま芋のレモン煮': { category: '副菜', price: 400 },
-      'ソフト金時豆': { category: '副菜', price: 380 },
-      'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420, allergenFree: true },
-      '尾西の五目ごはん': { category: '主食', price: 380 },
-      '尾西の松茸ごはん': { category: '主食', price: 480 },
-      '尾西のチキンライス': { category: '主食', price: 420 },
-      '尾西のえびピラフ': { category: '主食', price: 420 },
-      '尾西の白飯': { category: '主食', price: 300, allergenFree: true },
-      '尾西の赤飯': { category: '主食', price: 380, allergenFree: true },
-      '尾西のわかめごはん': { category: '主食', price: 380, allergenFree: true },
-      '尾西のきのこごはん': { category: '主食', price: 380, allergenFree: true },
-      '尾西の山菜おこわ': { category: '主食', price: 380, allergenFree: true },
-      '尾西のたけのこごはん': { category: '主食', price: 480, allergenFree: true },
-      '尾西のアレルギー対応五目ごはん': { category: '主食', price: 400, allergenFree: true },
-      '尾西のドライカレー': { category: '主食', price: 420, allergenFree: true },
-      '白がゆ': { category: '主食', price: 280, allergenFree: true },
-      '梅がゆ': { category: '主食', price: 300, allergenFree: true },
-      '塩こんぶがゆ': { category: '主食', price: 320, allergenFree: true },
-      '尾西のレンジ＋（プラス）五目ごはん': { category: '主食', price: 450 },
-      '尾西のレンジ＋（プラス）チキンライス': { category: '主食', price: 450 },
-      '尾西のレンジ＋（プラス）赤飯': { category: '主食', price: 450, allergenFree: true },
-      '尾西のレンジ＋（プラス）きのこごはん': { category: '主食', price: 450, allergenFree: true },
-      '尾西のレンジ＋（プラス）山菜おこわ': { category: '主食', price: 450, allergenFree: true },
-      '尾西のレンジ＋（プラス）たけのこごはん': { category: '主食', price: 480, allergenFree: true },
-      '尾西のレンジ＋（プラス）ドライカレー': { category: '主食', price: 450, allergenFree: true },
-      '携帯おにぎり 鮭': { category: '主食', price: 250, allergenFree: true },
-      '携帯おにぎり わかめ': { category: '主食', price: 250, allergenFree: true },
-      '携帯おにぎり 五目おこわ': { category: '主食', price: 250, allergenFree: true },
-      '携帯おにぎり 昆布': { category: '主食', price: 250, allergenFree: true },
-      '佐竹 白飯': { category: '主食', price: 330 },
-      '佐竹 五目ご飯': { category: '主食', price: 420 },
-      '佐竹 わかめご飯': { category: '主食', price: 390 },
-      '佐竹 青菜ご飯': { category: '主食', price: 390 },
-      '佐竹 梅昆布ご飯': { category: '主食', price: 440 },
-      '佐竹 鯛めし': { category: '主食', price: 440 },
-      '佐竹 梅じゃこご飯': { category: '主食', price: 390 },
-      '佐竹 根菜ご飯': { category: '主食', price: 420 },
-      '佐竹 ドライカレー': { category: '主食', price: 420 },
-      '佐竹 野菜ピラフ': { category: '主食', price: 420 },
-      '佐竹 チャーハン': { category: '主食', price: 420 },
-      '佐竹 白がゆ': { category: '主食', price: 310 },
-      '佐竹 梅がゆ': { category: '主食', price: 340 },
-      '佐竹 青菜がゆ': { category: '主食', price: 340 },
-      '醤油だし風味ラーメン': { category: '麺類', price: 300 },
-      'チゲ風味ラーメン': { category: '麺類', price: 360 },
-      'シーフード風味ラーメン': { category: '麺類', price: 360 },
+      // === ムース ===
       'あじのムース（にんじん付）': { category: 'ムース', price: 450 },
       'いかのムース（ごぼう付）': { category: 'ムース', price: 450 },
       '牛肉のムース（すき焼き風）': { category: 'ムース', price: 480 },
-      '豚肉のムース（しょうが焼き風）': { category: 'ムース', price: 480 }
+      '豚肉のムース（しょうが焼き風）': { category: 'ムース', price: 480 },
+      // === 甘味 ===
+      'スティックバウムクーヘン（プレーン）': { category: '甘味', price: 350 },
+      'スティックバウムクーヘン（ココア）': { category: '甘味', price: 350 },
+      // === 副菜 ===
+      'さつま芋のレモン煮': { category: '副菜', price: 400 },
+      'ソフト金時豆': { category: '副菜', price: 380 },
+      'かぼちゃ煮（アレルゲン不使用）': { category: '副菜', price: 420 },
     };
     
     if (selected.length === 0) {
@@ -1174,7 +1327,7 @@ if (step === 'business') {
   </div>
 )}
 
-       {step === 3 && (
+{step === 3 && (
   <div className="min-h-screen py-12 px-4 sm:px-6">
     <div className="max-w-4xl mx-auto">
       {/* タイトル */}
@@ -1203,7 +1356,38 @@ if (step === 'business') {
         </p>
       </div>
 
-      {/* プレビュー概要（ぼかし部分） */}
+      {/* ★修正: パーソナライズポイントのタイトルを見せる */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <User className="w-6 h-6 text-orange-500" />
+          <h3 className="text-xl font-bold text-slate-800">✨ あなた専用のカスタマイズ</h3>
+        </div>
+        
+        {generatePreviewPersonalizations().map((personData, pIdx) => (
+          <div key={pIdx} className="mb-4 last:mb-0">
+            {personData.personLabel && (
+              <p className="text-sm font-semibold text-slate-600 mb-2">{personData.personLabel}</p>
+            )}
+            <div className="space-y-3">
+              {personData.points.map((point, idx) => (
+                <div key={idx} className="bg-orange-50 rounded-xl p-4 border-l-4 border-orange-500">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      {/* タイトルは見せる */}
+                      <h5 className="font-bold text-slate-800 text-sm">{point.title}</h5>
+                      {/* 詳細はぼかす */}
+                      <div className="mt-1 h-4 bg-slate-200 rounded blur-sm"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 価格・セット内容プレビュー（ぼかし部分） */}
       <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6 relative overflow-hidden">
         <div className="flex items-center gap-3 mb-4">
           <Package className="w-6 h-6 text-orange-500" />
