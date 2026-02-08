@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';  // ← この行を追加
 import { auth, db } from './firebase';
+import { initGA, logPageView } from './utils/analytics'; 
 import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles, LogOut, UserCircle, MapPin, CreditCard } from 'lucide-react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
@@ -51,6 +52,15 @@ const ShukiApp = () => {
       tastePreference2: '' 
     }))
   });
+  // Google Analytics初期化
+  useEffect(() => {
+    initGA();
+  }, []);
+
+  // ページ遷移時にページビューを記録
+  useEffect(() => {
+    logPageView();
+  }, [step]);
 
   const handleStepChange = (n) => {
     setFadeIn(false);
