@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-
-import { auth, db } from './firebase';import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles, LogOut, UserCircle, MapPin, CreditCard } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';  // ← この行を追加
+import { auth, db } from './firebase';
+import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles, LogOut, UserCircle, MapPin, CreditCard } from 'lucide-react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 import AuthModal from './AuthModal';
@@ -2113,6 +2114,7 @@ if (step === 'business') {
         onClose={() => setShowAuthModal(false)} 
         onSuccess={handleAuthSuccess} 
       />
+      <Analytics />  {/* ← この行を追加 */}
     </div>
     </div>
 );
