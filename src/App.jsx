@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';  // ← この行を追加
 import { auth, db } from './firebase';
 import { initGA, logPageView } from './utils/analytics'; 
-import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles, LogOut, UserCircle, MapPin, CreditCard } from 'lucide-react';
+import { Shield, ArrowRight, Loader2, Package, Mail, CheckCircle2, User, Home, Users, Utensils, AlertTriangle, Sparkles, LogOut, UserCircle, MapPin, CreditCard ,Lock} from 'lucide-react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 import AuthModal from './AuthModal';
@@ -1337,14 +1337,26 @@ if (step === 'business') {
     </div>
   </div>
 )}
+Shuki step3 improved · JSX
+コピー
+
+// ========================================
+// 護己 - Step 3 モザイク部分 改善版コード
+// ========================================
+// 既存のstep === 3の部分を、以下のコードに置き換えてください
 
 {step === 3 && (
   <div className="min-h-screen py-12 px-4 sm:px-6">
     <div className="max-w-4xl mx-auto">
       {/* タイトル */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full mb-4">
-          <Sparkles className="w-8 h-8 text-white" />
+        <div className="relative inline-block">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full mb-4 relative">
+            <Sparkles className="w-10 h-10 text-white" />
+            {/* キラキラエフェクト */}
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+            <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-orange-300 rounded-full animate-pulse"></div>
+          </div>
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
           診断結果が出ました！
@@ -1367,116 +1379,211 @@ if (step === 'business') {
         </p>
       </div>
 
-      {/* ★修正: パーソナライズポイントのタイトルを見せる */}
+      {/* ★改善版: パーソナライズポイント */}
       <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-6">
           <User className="w-6 h-6 text-orange-500" />
           <h3 className="text-xl font-bold text-slate-800">✨ あなた専用のカスタマイズ</h3>
         </div>
         
-        {generatePreviewPersonalizations().map((personData, pIdx) => (
-          <div key={pIdx} className="mb-4 last:mb-0">
-            {personData.personLabel && (
-              <p className="text-sm font-semibold text-slate-600 mb-2">{personData.personLabel}</p>
-            )}
-            <div className="space-y-3">
-              {personData.points.map((point, idx) => (
-                <div key={idx} className="bg-orange-50 rounded-xl p-4 border-l-4 border-orange-500">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                      {/* タイトルは見せる */}
-                      <h5 className="font-bold text-slate-800 text-sm">{point.title}</h5>
-                      {/* 詳細はぼかす */}
-                      <div className="mt-1 h-4 bg-slate-200 rounded blur-sm"></div>
+        <div className="space-y-4">
+          {/* 最初の3つのポイントだけ表示 */}
+          {generatePreviewPersonalizations().slice(0, 1).map((personData, pIdx) => (
+            <div key={pIdx}>
+              {personData.personLabel && (
+                <p className="text-sm font-semibold text-slate-600 mb-3">{personData.personLabel}</p>
+              )}
+              <div className="space-y-3">
+                {personData.points.slice(0, 3).map((point, idx) => (
+                  <div key={idx} className="relative overflow-hidden bg-white rounded-xl border border-slate-200">
+                    <div className="p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0"></div>
+                        {/* タイトルは見せる */}
+                        <h5 className="font-bold text-slate-800 text-sm">{point.title}</h5>
+                      </div>
+                      
+                      {/* 詳細部分 - 美しくぼかす */}
+                      <div className="relative mt-2 overflow-hidden rounded-md h-10">
+                        {/* 実際のコンテンツ（ぼかし） */}
+                        <div className="absolute inset-0 blur-[6px] select-none pointer-events-none opacity-50">
+                          <p className="text-sm text-slate-600 px-2">{point.detail}</p>
+                        </div>
+                        
+                        {/* グラデーションオーバーレイ */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-50/90 via-orange-100/70 to-orange-50/90"></div>
+                        
+                        {/* キラキラエフェクト */}
+                        <div className="absolute inset-0">
+                          <div className="absolute top-1/2 left-1/4 w-1 h-1 bg-orange-400 rounded-full animate-ping" 
+                               style={{animationDelay: `${idx * 0.3}s`}}></div>
+                          <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-orange-300 rounded-full animate-pulse"
+                               style={{animationDelay: `${idx * 0.5}s`}}></div>
+                        </div>
+                        
+                        {/* ロックアイコン */}
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Lock className="w-4 h-4 text-orange-400" />
+                        </div>
+                      </div>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          
+          {/* 残りのポイント数を表示 */}
+          {generatePreviewPersonalizations()[0]?.points.length > 3 && (
+            <div className="text-center py-2">
+              <p className="text-sm text-slate-500 flex items-center justify-center gap-2">
+                <Sparkles className="w-4 h-4 text-orange-400" />
+                +他 {generatePreviewPersonalizations()[0].points.length - 3} 件のパーソナライズポイント
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ★改善版: セット内容・価格プレビュー */}
+      <div className="relative overflow-hidden rounded-2xl border-2 border-slate-200 shadow-lg">
+        {/* チラ見せコンテンツ */}
+        <div className="bg-white p-6 sm:p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Package className="w-6 h-6 text-orange-500" />
+            <h3 className="text-xl font-bold text-slate-800">あなた専用の防災セット</h3>
+          </div>
+          
+          {/* 最初の2-3品は完全に見せる */}
+          <div className="space-y-3 mb-4">
+            {['保存水 500ml (2本)', 'LEDライト', '簡易トイレ (10個)'].map((item, index) => (
+              <div key={index} className="flex items-center gap-3 p-4 bg-gradient-to-r from-slate-50 to-white rounded-lg border border-slate-200 shadow-sm">
+                <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-orange-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-slate-800 text-sm">{item}</p>
+                  <p className="text-xs text-slate-500">防災必須アイテム</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* 残りの商品はぼかし */}
+          <div className="relative min-h-[200px]">
+            {/* ぼかしコンテンツ */}
+            <div className="blur-md opacity-30 select-none pointer-events-none space-y-3">
+              {[1, 2, 3, 4].map((_, index) => (
+                <div key={index} className="flex items-center gap-3 p-4">
+                  <div className="w-12 h-12 bg-slate-200 rounded-lg"></div>
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-slate-200 rounded w-1/2"></div>
                   </div>
                 </div>
               ))}
             </div>
+            
+            {/* 美しいグラデーションフェード */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white pointer-events-none"></div>
           </div>
-        ))}
-      </div>
-
-      {/* 価格・セット内容プレビュー（ぼかし部分） */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6 relative overflow-hidden">
-        <div className="flex items-center gap-3 mb-4">
-          <Package className="w-6 h-6 text-orange-500" />
-          <h3 className="text-xl font-bold text-slate-800">あなた専用の防災セット</h3>
         </div>
         
-        {/* ぼかしオーバーレイ */}
-        <div className="relative">
-          <div className="blur-sm pointer-events-none">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-              {['保存水', 'LEDライト', '簡易トイレ', 'アルミブランケット', '備蓄食品×6', '衛生用品'].map((item, i) => (
-                <div key={i} className="bg-slate-100 rounded-lg p-3 text-center">
-                  <span className="text-sm text-slate-600">{item}</span>
-                </div>
-              ))}
-            </div>
-            <div className="bg-orange-50 rounded-xl p-4">
-              <p className="text-slate-700">
-                <span className="font-bold text-orange-600">初期費用:</span> ¥●,●●●〜
-              </p>
-              <p className="text-slate-700">
-                <span className="font-bold text-orange-600">年会費:</span> ¥●,●●●/年
-              </p>
-            </div>
-          </div>
-          
-          {/* ログイン誘導オーバーレイ */}
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-orange-500" />
+        {/* ログイン誘導オーバーレイ - 改善版 */}
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/0 via-white/70 to-white/95 backdrop-blur-[1px]">
+          <div className="text-center p-6 sm:p-8 max-w-md">
+            {/* アイコン部分 - キラキラアニメーション */}
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              {/* 外側のパルス */}
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full animate-pulse opacity-75"></div>
+              
+              {/* 内側の白い円 */}
+              <div className="absolute inset-3 bg-white rounded-full flex items-center justify-center shadow-lg">
+                <Sparkles className="w-12 h-12 text-orange-500" />
               </div>
-              <p className="text-lg font-bold text-slate-800 mb-2">
-                詳細を見るにはログインが必要です
-              </p>
-              <p className="text-sm text-slate-600 mb-4">
-                無料アカウント登録で、あなた専用の<br />備蓄プランをすべてご覧いただけます
-              </p>
+              
+              {/* 周囲のキラキラ */}
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
+              <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
+              <div className="absolute top-1/2 -right-3 w-2 h-2 bg-orange-300 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
+            </div>
+            
+            {/* メッセージ */}
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2 leading-tight">
+              あなた専用の防災セットが<br />
+              完成しました！
+            </h3>
+            <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+              全 <strong className="text-orange-600">{personCount}人分</strong> の厳選アイテムと<br />
+              パーソナライズポイントを確認できます
+            </p>
+            
+            {/* CTAボタン - グラデーション強化 */}
+            <button 
+              onClick={() => setShowAuthModal(true)}
+              className="group w-full bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white font-bold py-5 px-8 rounded-xl transition-all duration-500 shadow-xl hover:shadow-2xl transform hover:scale-105"
+            >
+              <span className="flex items-center justify-center gap-3 text-lg">
+                <Mail className="w-6 h-6" />
+                ログインして詳細を見る
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </button>
+            
+            {/* サブテキスト */}
+            <p className="text-xs text-slate-500 mt-4 flex items-center justify-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-green-500" />
+              無料アカウント作成で全ての情報が見られます
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* メリット説明 - デザイン改善 */}
+      <div className="mt-8 bg-gradient-to-br from-slate-50 to-orange-50 rounded-xl p-6 border border-orange-100">
+        <h4 className="font-bold text-slate-800 mb-4 text-center flex items-center justify-center gap-2">
+          <Sparkles className="w-5 h-5 text-orange-500" />
+          無料登録するとできること
+        </h4>
+        <div className="grid sm:grid-cols-3 gap-4">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-100">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-sm text-slate-800 mb-1">食品リスト確認</p>
+                <p className="text-xs text-slate-600">あなた専用の厳選10品を表示</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-100">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-sm text-slate-800 mb-1">好みで選択</p>
+                <p className="text-xs text-slate-600">10品から好きな6品を選択</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-100">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-sm text-slate-800 mb-1">診断結果保存</p>
+                <p className="text-xs text-slate-600">いつでも確認・変更可能</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ログイン/登録ボタン */}
-      <div className="space-y-4">
-        <button
-          onClick={() => setShowAuthModal(true)}
-          className="w-full px-8 py-5 bg-orange-500 text-white text-xl font-bold rounded-xl hover:bg-orange-600 transition-all transform hover:scale-[1.02] shadow-lg flex items-center justify-center gap-3"
-        >
-          <Mail className="w-6 h-6" />
-          ログイン / 無料登録して詳細を見る
-        </button>
-        
+      {/* 最初に戻るボタン */}
+      <div className="mt-6">
         <button
           onClick={() => handleStepChange(1)}
           className="w-full px-6 py-3 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-all"
         >
           最初からやり直す
         </button>
-      </div>
-
-      {/* メリット説明 */}
-      <div className="mt-8 bg-slate-50 rounded-xl p-6">
-        <h4 className="font-bold text-slate-800 mb-4 text-center">無料登録するとできること</h4>
-        <div className="grid sm:grid-cols-3 gap-4">
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-            <span className="text-sm text-slate-600">あなた専用の食品リストを確認</span>
-          </div>
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-            <span className="text-sm text-slate-600">好みに合わせて食品を選択</span>
-          </div>
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-            <span className="text-sm text-slate-600">診断結果を保存・いつでも確認</span>
-          </div>
-        </div>
       </div>
     </div>
     
@@ -1487,6 +1594,8 @@ if (step === 'business') {
     />
   </div>
 )}
+
+
 
 {step === 4 && (
   <div className="min-h-screen py-12 px-6">
