@@ -1086,11 +1086,21 @@ const BusinessPage = ({ onBack }) => {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 {/* フッターもロゴ画像に（暗い背景用に調整が必要な場合は別画像を用意） */}
-                <img 
-                  src="/rogo2.png" 
-                  alt="護己 -shuki-" 
-                  className="h-10 w-auto brightness-0 invert"
-                />
+
+
+// ファイルの先頭に追加
+import logoImage from '/rogo2.png';
+
+// そしてimgタグで使用
+<img 
+  src={logoImage} 
+  alt="護己 -shuki-" 
+  className="h-12 w-auto"
+/>
+
+現在の BusinessPage.jsx のヘッダー部分（ロゴ周辺）のコードを見せてもらえますか？
+bashhead -100 src/components/BusinessPage.jsx Opus 4.5
+
               </div>
               <p className="text-slate-300 text-base">
                 届いた瞬間、防災管理は終了。

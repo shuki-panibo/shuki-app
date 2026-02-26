@@ -912,7 +912,8 @@ if (step === 'business') {
   <div className="max-w-3xl w-full text-center space-y-6 sm:space-y-8">
     {/* シールドアイコンを削除 */}
     <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-slate-800">
-      護己 <span className="text-2xl sm:text-3xl md:text-4xl text-slate-600">-Shuki-</span>
+      護己
+       <span className="text-2xl sm:text-3xl md:text-4xl text-slate-600">-Shuki-</span>
     </h1>
     <p className="text-2xl sm:text-3xl md:text-4xl text-orange-500 font-bold px-4 leading-relaxed">
       日常に溶け込む、あなただけの防災。
