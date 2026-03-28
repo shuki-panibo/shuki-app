@@ -105,7 +105,7 @@ const ShukiApp = () => {
       setPersonCount(personCount - 1);
       // Reset the last person's data
       const newPersons = [...formData.persons];
-      newPersons[personCount - 1] = { age: '', gender: '', allergies: [], allergyOther: '', foodPreference: '', tastePreference: '', tastePreference2: '' };
+      newPersons[personCount - 1] = { age: '', gender: '', allergies: [], allergyOther: '', foodPreference: '', tastePreference: '', tastePreference2: '', contactLens: false }
       setFormData({...formData, persons: newPersons});
     }
   };
@@ -837,6 +837,8 @@ const selectedFoods = rec.boxes.map((box, idx) => {
     formDataToSubmit.append('address', formData.shippingAddress.address);
     formDataToSubmit.append('building', formData.shippingAddress.building || '');
     formDataToSubmit.append('additionalCosts', JSON.stringify(additionalCosts));
+    const contactLensCount = formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length;
+formDataToSubmit.append('contactLensOption', contactLensCount > 0 ? `コンタクト保存液3日分×${contactLensCount}人 +¥${contactLensCount * 600}` : 'なし');
     formDataToSubmit.append('paymentMethod', selectedPaymentMethod); // ★引数を使用
     
     console.log('📡 Google Apps Scriptにリクエスト送信中...');
@@ -910,6 +912,7 @@ if (step === 'business') {
     )}
    <div className={`min-h-[70vh] flex items-center justify-center p-4 sm:p-6 ${user ? 'pt-24' : 'pt-8'}`}>
   <div className="max-w-3xl w-full text-center space-y-6 sm:space-y-8">
+
     {/* シールドアイコンを削除 */}
     <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-slate-800">
       護己
@@ -1263,7 +1266,19 @@ if (step === 'business') {
                     ))}
                   </div>
                 </div>
-
+<div>
+  <label className="block text-base font-semibold text-slate-700 mb-3">
+    コンタクトレンズ使用
+  </label>
+  <div className="grid grid-cols-2 gap-3">
+    {['使用する', '使用しない'].map(o => (
+      <button key={o} onClick={() => updatePerson(personIndex, 'contactLens', o === '使用する')}
+        className={`px-4 py-3 rounded-xl font-medium transition-all ${formData.persons[personIndex].contactLens === (o === '使用する') ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+        {o}
+      </button>
+    ))}
+  </div>
+</div>
                 <div><label className="block text-base font-semibold text-slate-700 mb-3">アレルギー（複数選択可）</label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {['特になし', '卵', '乳製品', '小麦', 'そば', '落花生', 'えび', 'かに'].map(o => (
@@ -1795,7 +1810,7 @@ if (step === 'business') {
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-orange-300 gap-2">
       <span className="text-base sm:text-lg font-bold text-slate-800">💰 初期コスト（初回のみ）</span>
       <span className="text-2xl sm:text-3xl font-bold text-orange-500">
-        ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)).toLocaleString()}
+        ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)+ formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600).toLocaleString()}
       </span>
     </div>
     <div className="text-xs sm:text-sm text-slate-600 space-y-1">
@@ -1815,9 +1830,15 @@ if (step === 'business') {
         }
         return null;
       })}
+      {formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length > 0 && (
+  <div className="flex justify-between text-orange-600 font-semibold">
+    <span>コンタクト保存液（3日分×{formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length}人）</span>
+    <span>+¥{(formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600).toLocaleString()}</span>
+  </div>
+)}
       <div className="flex justify-between pt-2 border-t border-orange-200 font-bold text-base">
         <span>小計（初期費用）</span>
-        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)).toLocaleString()}</span>
+        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)+ formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600).toLocaleString()}</span>
       </div>
       <div className="flex justify-between text-slate-700">
         <span>年間サブスク（{rec.personCount}人分）</span>
@@ -1825,7 +1846,7 @@ if (step === 'business') {
       </div>
       <div className="flex justify-between pt-2 border-t-2 border-orange-300 font-bold text-lg text-orange-600">
         <span>合計（初年度）</span>
-        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0) + rec.annualCost).toLocaleString()}</span>
+        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)+ formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600 + rec.annualCost).toLocaleString()}</span>
       </div>
     </div>
   </div>
@@ -1927,7 +1948,7 @@ if (step === 'business') {
         <div className="flex justify-between items-center mt-2">
           <span className="text-sm text-slate-600">合計（初年度）</span>
           <span className="font-bold text-lg text-slate-800">
-            ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0) + rec.annualCost).toLocaleString()}
+            ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)+ formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600 + rec.annualCost).toLocaleString()}
           </span>
         </div>
       </div>
