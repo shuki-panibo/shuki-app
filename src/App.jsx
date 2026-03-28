@@ -1810,7 +1810,7 @@ if (step === 'business') {
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-orange-300 gap-2">
       <span className="text-base sm:text-lg font-bold text-slate-800">💰 初期コスト（初回のみ）</span>
       <span className="text-2xl sm:text-3xl font-bold text-orange-500">
-        ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)+ formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600).toLocaleString()}
+        ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)).toLocaleString()}
       </span>
     </div>
     <div className="text-xs sm:text-sm text-slate-600 space-y-1">
@@ -1830,15 +1830,10 @@ if (step === 'business') {
         }
         return null;
       })}
-      {formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length > 0 && (
-  <div className="flex justify-between text-orange-600 font-semibold">
-    <span>コンタクト保存液（3日分×{formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length}人）</span>
-    <span>+¥{(formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600).toLocaleString()}</span>
-  </div>
-)}
+    
       <div className="flex justify-between pt-2 border-t border-orange-200 font-bold text-base">
         <span>小計（初期費用）</span>
-        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)+ formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600).toLocaleString()}</span>
+        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)).toLocaleString()}</span>
       </div>
       <div className="flex justify-between text-slate-700">
         <span>年間サブスク（{rec.personCount}人分）</span>
@@ -1846,7 +1841,7 @@ if (step === 'business') {
       </div>
       <div className="flex justify-between pt-2 border-t-2 border-orange-300 font-bold text-lg text-orange-600">
         <span>合計（初年度）</span>
-        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)+ formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600 + rec.annualCost).toLocaleString()}</span>
+        <span>¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0) + rec.annualCost).toLocaleString()}</span>
       </div>
     </div>
   </div>
@@ -1948,7 +1943,7 @@ if (step === 'business') {
         <div className="flex justify-between items-center mt-2">
           <span className="text-sm text-slate-600">合計（初年度）</span>
           <span className="font-bold text-lg text-slate-800">
-            ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0)+ formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length * 600 + rec.annualCost).toLocaleString()}
+            ¥{(9980 * rec.personCount + rec.boxes.reduce((sum, box, idx) => sum + validateSelection(idx).additionalCost, 0) + rec.annualCost).toLocaleString()}
           </span>
         </div>
       </div>
