@@ -488,7 +488,9 @@ const ShukiApp = () => {
       if (person.gender === '女性') {
         baseItems.push({ name: '生理用品・衛生セット', img: '🧴' });
       }
-      
+      if (person.contactLens) {
+  baseItems.push({ name: 'コンタクト保存液（3日分）', img: '👁️' });
+}
      // ★推奨食品を整形（10品）
       const recommendedItems = recommendedFoods.map(name => ({
         name,
@@ -781,9 +783,9 @@ const submitToGoogleForm = async (selectedPaymentMethod) => {
     const exchangeDateStr = exchangeDate.toLocaleDateString('ja-JP');
     
     const personDetails = rec.boxes.map((box, idx) => {
-      const person = formData.persons[idx];
-      return `【${box.personLabel || '本人'}】年齢:${person.age} 性別:${person.gender} アレルギー:${person.allergies.join('、') || '特になし'} 食の好み:${person.foodPreference} 味:${person.tastePreference}${person.tastePreference2 ? '/' + person.tastePreference2 : ''}`;
-    }).join(' | ');
+  const person = formData.persons[idx];
+  return `【${box.personLabel || '本人'}】年齢:${person.age} 性別:${person.gender} アレルギー:${person.allergies.join('、') || '特になし'} 食の好み:${person.foodPreference} 味:${person.tastePreference}${person.tastePreference2 ? '/' + person.tastePreference2 : ''} コンタクト:${person.contactLens ? 'あり' : 'なし'}`;
+}).join(' | ');
     
     const baseItems = rec.boxes.map((box, idx) => {
       return `[${box.personLabel || '本人'}]${box.baseItems.map(item => item.name).join('、')}`;
@@ -837,8 +839,8 @@ const selectedFoods = rec.boxes.map((box, idx) => {
     formDataToSubmit.append('address', formData.shippingAddress.address);
     formDataToSubmit.append('building', formData.shippingAddress.building || '');
     formDataToSubmit.append('additionalCosts', JSON.stringify(additionalCosts));
-    const contactLensCount = formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length;
-formDataToSubmit.append('contactLensOption', contactLensCount > 0 ? `コンタクト保存液3日分×${contactLensCount}人 +¥${contactLensCount * 600}` : 'なし');
+   const contactLensCount = formData.persons.slice(0, rec.personCount).filter(p => p.contactLens).length;
+formDataToSubmit.append('contactLensOption', contactLensCount > 0 ? `コンタクト保存液3日分×${contactLensCount}人` : 'なし');
     formDataToSubmit.append('paymentMethod', selectedPaymentMethod); // ★引数を使用
     
     console.log('📡 Google Apps Scriptにリクエスト送信中...');
