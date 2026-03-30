@@ -175,6 +175,107 @@ const BusinessPage = ({ onBack }) => {
           <ChevronDown className="w-8 h-8 text-white/60" />
         </div>
       </section>
+      {/* ===== セクションA: 問題提起 ===== */}
+<section className="py-20 px-4 bg-gradient-to-b from-red-950 to-slate-900 text-white">
+  <div className="max-w-4xl mx-auto">
+    <div className="text-center mb-14">
+      <div className="inline-flex items-center gap-2 bg-red-500/20 border border-red-400/40 px-5 py-2.5 rounded-full mb-6">
+        <AlertTriangle className="w-5 h-5 text-red-400" />
+        <span className="text-base font-bold text-red-300">経営者への警告</span>
+      </div>
+      <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
+        社長、御社の防災・BCP、<br />
+        <span className="text-red-400">形だけ</span>になっていませんか？
+      </h3>
+    </div>
+
+    <div className="space-y-6 mb-14">
+      {[
+        {
+          quote: '分厚いマニュアルは、停電したオフィスでは誰も読みません。',
+          body: '能登半島地震の現場では、棚に並んだBCPマニュアルは一度も開かれなかった。必要なのは「読むもの」ではなく、「体が動くもの」です。'
+        },
+        {
+          quote: '「全員同じ備蓄」は、弱点を持つ社員をパニックに陥らせ、組織全体の復旧を遅らせます。',
+          body: 'アレルギーのある社員、コンタクトレンズが必要な社員、生理用品が必要な社員——画一的な備蓄は、いざという時に「使えない備蓄」になります。'
+        },
+        {
+          quote: '自己責任という言葉で、経営リスクから目を背けないでください。',
+          body: '安全配慮義務は、災害時にも経営者に課せられます。備蓄の不備が原因で従業員が被害を受けた場合、会社は法的責任を問われる時代です。'
+        }
+      ].map((item, i) => (
+        <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-7 hover:bg-white/10 transition">
+          <p className="text-xl sm:text-2xl font-bold text-red-300 mb-4 leading-relaxed">
+            「{item.quote}」
+          </p>
+          <p className="text-base sm:text-lg text-slate-300 leading-relaxed">{item.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+{/* ===== セクションB: BCPの本来の目的 ===== */}
+<section className="py-20 px-4 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+  <div className="max-w-4xl mx-auto">
+    <div className="text-center mb-14">
+      <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/40 px-5 py-2.5 rounded-full mb-6">
+        <Shield className="w-5 h-5 text-orange-400" />
+        <span className="text-base font-bold text-orange-300">BCPの本質</span>
+      </div>
+      <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight">
+        BCPは書類作成ではなく、<br />
+        会社と社員を死なせない<br />
+        <span className="text-orange-400">「仕組み」</span>です。
+      </h3>
+    </div>
+
+    <div className="grid md:grid-cols-2 gap-6 mb-12">
+      <div className="bg-red-500/10 border-2 border-red-500/30 rounded-2xl p-7">
+        <h4 className="text-xl font-bold text-red-400 mb-5">❌ 従来型BCP（机上の空論）</h4>
+        <ul className="space-y-3">
+          {[
+            '分厚いマニュアルを作って終わり',
+            '全員同じ内容の研修',
+            '画一的な備蓄品を倉庫に積む',
+            '数年に一度の形式的な見直し',
+            '誰も読まない緊急連絡網'
+          ].map((item, i) => (
+            <li key={i} className="flex items-center gap-3 text-slate-300 text-base">
+              <span className="w-2 h-2 bg-red-400 rounded-full flex-shrink-0" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="bg-orange-500/10 border-2 border-orange-500/30 rounded-2xl p-7">
+        <h4 className="text-xl font-bold text-orange-400 mb-5">✅ 護己流BCP（実効性重視）</h4>
+        <ul className="space-y-3">
+          {[
+            '一人ひとりに届く個別最適化備蓄',
+            '人命保護を最優先した設計',
+            '安全配慮義務の履行を証明できる記録',
+            '事業トリアージ（何を守り何を捨てるか）',
+            '資金繰り・信用死守まで考えた継続計画'
+          ].map((item, i) => (
+            <li key={i} className="flex items-center gap-3 text-slate-300 text-base">
+              <CheckCircle2 className="w-5 h-5 text-orange-400 flex-shrink-0" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div className="bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-400/30 rounded-2xl p-8 text-center">
+      <p className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
+        護己は、<span className="text-orange-400">「届いた瞬間に機能する備蓄」</span>と<br />
+        <span className="text-orange-400">「実効性のある継続計画」</span>を同時に提供します。
+      </p>
+    </div>
+  </div>
+</section>
 
       {/* ===== セクション2: 課題喚起 - 文字サイズアップ、余白調整 ===== */}
       <section className="py-20 px-4 bg-gradient-to-b from-slate-100 to-white">
