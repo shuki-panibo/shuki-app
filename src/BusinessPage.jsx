@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Shield, ArrowRight, ArrowLeft, CheckCircle2, Users, Building2, Calendar, Phone, Mail, MessageCircle, ChevronDown, Sparkles, Target, TrendingUp, Award, Clock, Heart, Zap, AlertTriangle, UserCheck, FileCheck, BarChart3, RefreshCw, Package, Bell } from 'lucide-react';
+const logoImage = '/rogo2.png';
 
 const BusinessPage = ({ onBack }) => {
   const [formData, setFormData] = useState({
@@ -1088,8 +1089,6 @@ const BusinessPage = ({ onBack }) => {
                 {/* フッターもロゴ画像に（暗い背景用に調整が必要な場合は別画像を用意） */}
 
 
-// ファイルの先頭に追加
-import logoImage from '/rogo2.png';
 
 // そしてimgタグで使用
 <img 
